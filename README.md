@@ -28,3 +28,11 @@ Dane kontaktowe potwierdzone przez właściciela: Pocztowa 11, Gorzów Wielkopol
 ## Do uzupełnienia
 
 Potwierdzone stawki skupu, ewentualny koszt badania, pełna informacja o prywatności i umowa API z przyszłym CMS. Publikacja Sites jest prywatna do czasu zmiany dostępu przez właściciela.
+
+## Osobne strony HTML
+
+Każda pozycja menu ma oddzielny adres i plik `index.html`: `/skup-zlota/`, `/skup-srebra/`, `/skup-platyny/`, `/skup-palladu/`, `/co-przyjmujemy/`, `/oferta/`, `/blog/` i `/kontakt/`. Kategorie przedmiotów mają strony w `/co-przyjmujemy/<kategoria>/`, a pojedyncze teksty w `/blog/<slug>/`. Dostępna jest też strona `/badanie-spektrometrem/`.
+
+`python3 scripts/build.py` generuje te strony oraz statyczne karty poradników ze wspólnego pliku `dist/data/articles.json`. Lista artykułów działa bez JavaScript. Wspólne menu i stopka pochodzą ze strony głównej. Nie ma jeszcze połączenia z centralnym CMS.
+
+Fotografie poradników są wygenerowanymi zdjęciami ilustracyjnymi; nie pokazują rzeczywistych urządzeń firmy ani aktualnych przedmiotów w sprzedaży. Ilustracje spektrometru i telefonu znajdują się w `dist/assets/blog-*.webp`.

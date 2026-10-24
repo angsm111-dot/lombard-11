@@ -1,6 +1,27 @@
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#nav-links');
-if(toggle && nav){toggle.addEventListener('click',()=>{const open=toggle.getAttribute('aria-expanded')!=='true';toggle.setAttribute('aria-expanded',String(open));toggle.setAttribute('aria-label',open?'Zamknij menu':'Otwórz menu');nav.classList.toggle('open',open);});nav.querySelectorAll('a').forEach(link=>link.addEventListener('click',()=>{toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Otwórz menu');nav.classList.remove('open');}));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav.classList.contains('open')){toggle.click();toggle.focus();}});}
-const year=document.querySelector('#year');if(year)year.textContent=new Date().getFullYear();
-const articles=document.querySelector('#articles');
-if(articles)fetch('/data/articles.json').then(r=>{if(!r.ok)throw new Error('Nie udało się pobrać artykułów');return r.json();}).then(posts=>{for(const post of posts){const a=document.createElement('a');a.className='article-card';a.href='/blog/'+post.slug+'/';const art=document.createElement('div');art.className='article-art '+post.visual;art.setAttribute('aria-hidden','true');const meta=document.createElement('div');meta.className='article-meta';const category=document.createElement('span');category.textContent=post.category;const time=document.createElement('span');time.textContent=post.readTime+' min czytania';meta.append(category,time);const h=document.createElement('h3');h.textContent=post.title;const p=document.createElement('p');p.textContent=post.excerpt;const more=document.createElement('span');more.className='article-more';more.textContent='Przeczytaj poradnik ↗';a.append(art,meta,h,p,more);articles.append(a);}}).catch(()=>{const p=document.createElement('p');p.textContent='Poradniki: ';[['proby-zlota','Próby złota'],['badanie-spektrometrem','Badanie spektrometrem'],['przygotowanie-telefonu','Sprzedaż telefonu']].forEach(([slug,title])=>{const a=document.createElement('a');a.href='/blog/'+slug+'/';a.textContent=title+' → ';p.append(a);});articles.append(p);});
+if (toggle && nav) {
+  const closeMenu = () => {
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.setAttribute('aria-label', 'Otwórz menu');
+    nav.classList.remove('open');
+  };
+  toggle.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') !== 'true';
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Zamknij menu' : 'Otwórz menu');
+    nav.classList.toggle('open', open);
+  });
+  nav.querySelectorAll('a').forEach(link => link.addEventListener('click', closeMenu));
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && nav.classList.contains('open')) {
+      closeMenu(); toggle.focus();
+    }
+  });
+  document.addEventListener('click', event => {
+    if (!nav.contains(event.target) && !toggle.contains(event.target)) closeMenu();
+  });
+  matchMedia('(min-width: 1101px)').addEventListener('change', closeMenu);
+}
+const year = document.querySelector('#year');
+if (year) year.textContent = new Date().getFullYear();
