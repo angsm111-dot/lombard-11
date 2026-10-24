@@ -1,0 +1,23 @@
+# Install ONLY in the new, isolated document root after backing up WordPress.
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+# Match the existing canonical-domain convention; DNS remains unchanged.
+RewriteCond %{HTTP_HOST} ^www\.lombard11\.pl$ [NC]
+RewriteRule ^ https://lombard11.pl%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+# Known indexed legacy addresses, mapped to relevant replacements.
+RedirectMatch 301 ^/contact/?$ /kontakt/
+RedirectMatch 301 ^/services/?$ /co-przyjmujemy/
+RedirectMatch 301 ^/skup-sprzedaz-telefonow-gorzow/?$ /co-przyjmujemy/telefony/
+RedirectMatch 301 ^/skup-sprzedaz-laptopow-gorzow-2/?$ /co-przyjmujemy/laptopy-i-elektronika/
+RedirectMatch 301 ^/skup-zlota-srebra-gorzow/?$ /skup-zlota/
+RedirectMatch 301 ^/pozyczki-pod-zastaw-gorzow/?$ /pozyczki-pod-zastaw/
+RedirectMatch 301 ^/gdzie-warto-sprzedac-zloto/?$ /blog/skup-zlotego-zlomu-gorzow/
+RedirectMatch 301 ^/allegro-olx/?$ /oferta/
+RedirectMatch 301 ^/na-sprzedaz/?$ /oferta/
+RedirectMatch 301 ^/skup-sprzedaz-laptopow-gorzow/?$ /co-przyjmujemy/laptopy-i-elektronika/
+RedirectMatch 301 ^/home/?$ /

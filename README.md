@@ -36,3 +36,9 @@ Każda pozycja menu ma oddzielny adres i plik `index.html`: `/skup-zlota/`, `/sk
 `python3 scripts/build.py` generuje te strony oraz statyczne karty poradników ze wspólnego pliku `dist/data/articles.json`. Lista artykułów działa bez JavaScript. Wspólne menu i stopka pochodzą ze strony głównej. Nie ma jeszcze połączenia z centralnym CMS.
 
 Fotografie poradników są wygenerowanymi zdjęciami ilustracyjnymi; nie pokazują rzeczywistych urządzeń firmy ani aktualnych przedmiotów w sprzedaży. Ilustracje spektrometru i telefonu znajdują się w `dist/assets/blog-*.webp`.
+
+## Blog i SEO dla lombard11.pl
+
+Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośnik z ikoną w menu. Każdy wpis ma oddzielną stronę HTML. Generator tworzy canonical, Open Graph, LocalBusiness, BlogPosting, `robots.txt` i `sitemap.xml` dla domeny `https://lombard11.pl`, zgodnie z obecnym przekierowaniem www.
+
+`python3 scripts/package-hosting.py` tworzy paczkę do niezależnego katalogu hostingu. Instrukcja i wynik audytu domeny: `hosting/MIGRACJA.md`. Znaleziono także stary blog WordPress; przed przełączeniem domeny należy zachować jego treści i rozliczyć adresy z `hosting/legacy-url-inventory.csv`. Przygotowanie paczki nie oznacza podłączenia domeny ani wdrożenia na istniejącym hostingu.

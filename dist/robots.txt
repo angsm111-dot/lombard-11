@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://lombard11.pl/sitemap.xml
