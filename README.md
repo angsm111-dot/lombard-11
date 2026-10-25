@@ -60,3 +60,7 @@ Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośni
 Strona główna jest krótkim wprowadzeniem z odnośnikami do działów; nie zawiera pełnego kontaktu, cennika, listy kategorii ani artykułów. Treść główna: `templates/home.html`. Dedykowane sekcje kontaktu, oferty i spektrometru są w odpowiednich plikach `templates/`, a generator publikuje je tylko na właściwych podstronach.
 
 Menu: Co przyjmujemy → Skup metali szlachetnych → Na sprzedaż → Badanie spektrometrem → Blog / poradnik → Kontakt. Badanie spektrometrem jest osobną pozycją głównego menu. Ogólny przegląd metali ma adres `/skup-metali-szlachetnych/`. Cennik i skrypt cen ładowane są na stronach złota i srebra. Dawne linki do sekcji strony głównej przekierowują do odpowiednich podstron.
+
+## Nazwa firmy
+
+Nazwa widoczna dla klientów i w metadanych to wyłącznie **Lombard Sezam**. „Lombard 11” jest identyfikatorem projektu i domeny, nie nazwą firmy. Nie dodawać go obok logo, w stopce, nagłówkach, opisach, tytułach ani danych strukturalnych. Domeny i nazw repozytorium nie należy z tego powodu zmieniać. Stopka nie zawiera haseł „Przedmioty z wartością” ani „Ludzie, z którymi warto porozmawiać”.
