@@ -10,7 +10,7 @@ python3 -m http.server 8000 --directory dist
 
 ## Zawartość
 
-- Skup złota z tabelą prób. Brak potwierdzonych stawek: strona kieruje do kontaktu, nie wyświetla wymyślonych cen.
+- Skup złota z cennikiem podłączonym do publicznego API panelu Sezam. Stawki są odświeżane co 5 minut; nie przeliczamy ponownie potrąceń.
 - Informacja o badaniu spektrometrem.
 - Kategorie przyjmowanych przedmiotów.
 - Bezpośredni link do oferty OLX Sezam.
@@ -27,7 +27,7 @@ Dane kontaktowe potwierdzone przez właściciela: Pocztowa 11, Gorzów Wielkopol
 
 ## Do uzupełnienia
 
-Potwierdzone stawki skupu, ewentualny koszt badania, pełna informacja o prywatności i umowa API z przyszłym CMS. Publikacja Sites jest prywatna do czasu zmiany dostępu przez właściciela.
+Ewentualny koszt badania, pełna informacja o prywatności i umowa API z przyszłym CMS. Publikacja Sites jest prywatna do czasu zmiany dostępu przez właściciela.
 
 ## Osobne strony HTML
 
@@ -46,3 +46,11 @@ Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośni
 ## Kafelki przyjmowanych przedmiotów
 
 Źródło kategorii: `dist/data/categories.json`. Generator tworzy z niego siedem kafelków ze zdjęciami na stronie głównej i stronie `/co-przyjmujemy/` oraz osobne podstrony kategorii. Fotografie z prefiksem `kategoria-` są ilustracyjne, wygenerowane do projektu. Wygaszenie obrazu i dopasowanie do tła realizuje CSS. Dawny adres `/co-przyjmujemy/sprzet-i-rowery/` pozostaje dostępny.
+
+## Integracja cen z panelem Sezam
+
+Źródło: `https://skup-zlota-gorzow.angsm111.workers.dev/api/prices`, projekt `angsm111-dot/nowa-skup-zlota-gorzow`. Pobierane są gotowe wartości `metals.gold.purities[próba].price` oraz analogiczne ceny srebra. Nigdy nie pobieramy hasła administratora i nie zmieniamy ustawień panelu.
+
+`dist/prices.js` odświeża publiczny cennik co pięć minut oraz po powrocie do karty. Korzysta z CORS, bez poświadczeń. Sprawdza kompletność, poprawność cen i czas źródła; odrzuca dane zapasowe oraz odczyty starsze niż 30 minut. Przy awarii zachowuje wyłącznie świeży, potwierdzony odczyt, a po jego wygaśnięciu pokazuje kontakt zamiast nieaktualnych stawek.
+
+`dist/data/prices.json` jest oznaczonym czasem odczytu snapshotem do renderowania HTML, nie osobnym edytowalnym cennikiem. Skrypt synchronizacji wymaga narzędzia `curl`. Aby odświeżyć go przed budową, uruchom `python3 scripts/sync-prices.py`, a potem `python3 scripts/build.py`. Bez JavaScript widoczny jest zapisany odczyt z jego datą, nie automatyczne aktualizacje. Skrypt nie korzysta z panelu administracyjnego do zapisu.

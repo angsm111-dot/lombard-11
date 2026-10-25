@@ -1,6 +1,7 @@
 """Build static service pages, blog listing and individual articles from structured data."""
 from pathlib import Path
 import json,html,re
+from prices import snapshot,price_cell,price_status,table as price_table
 root=Path(__file__).resolve().parents[1];dist=root/'dist'
 esc=html.escape
 wa=(root/'scripts/whatsapp.svg').read_text()
@@ -21,13 +22,17 @@ if '<!-- CATEGORY_CARDS_START -->' not in source:
 source=re.sub(r'<!-- CATEGORY_CARDS_START -->.*?<!-- CATEGORY_CARDS_END -->','<!-- CATEGORY_CARDS_START --><div class="categories">'+''.join(category_card(c,i) for i,c in enumerate(categories))+'</div><!-- CATEGORY_CARDS_END -->',source,flags=re.S)
 if '<!-- BLOG_CARDS_START -->' not in source:source=source.replace('<div id="articles" class="articles"></div>','<!-- BLOG_CARDS_START --><div id="articles" class="articles"></div><!-- BLOG_CARDS_END -->')
 source=re.sub(r'<!-- BLOG_CARDS_START -->.*?<!-- BLOG_CARDS_END -->','<!-- BLOG_CARDS_START --><div id="articles" class="articles">'+cards(3)+'</div><!-- BLOG_CARDS_END -->',source,flags=re.S)
+source=re.sub(r'<p class="price-notice"[^>]*>.*?</p>',price_status('gold'),source,flags=re.S)
+source=re.sub(r'<table>.*?</table>',price_table('gold',[('333','33,3%'),('585','58,5%'),('750','75,0%'),('999','99,9%')]),source,count=1,flags=re.S)
+source=source.replace('Łańcuszek, pojedynczy kolczyk, uszkodzony pierścionek? Liczy się zawartość kruszcu. Porozmawiajmy o wycenie Twojego złota.','Aktualne ceny skupu. Wycena po potwierdzeniu próby i masy złota.')
+if '<script src="/prices.js" defer></script>' not in source:source=source.replace('</head>','<script src="/prices.js" defer></script></head>')
 source=source.replace('↗',arrow);p.write_text(source)
 header=source[source.index('<body>')+6:source.index('<main id="main">')].replace('href="#main"','href="#main"')
 footer=source[source.index('<footer'):source.index('</body>')]
 def page(title,description,body,kind='article-page',path=None):
  nav=header
  if path:nav=nav.replace('href="'+path+'"','aria-current="page" href="'+path+'"')
- return '<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#783e38"><title>'+esc(title)+' | Lombard 11 — Sezam</title><meta name="description" content="'+esc(description,quote=True)+'"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script></head><body>'+nav+'<main id="main" class="wrap '+kind+'">'+body.replace('↗',arrow)+'</main>'+footer+'</body></html>'
+ return '<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#783e38"><title>'+esc(title)+' | Lombard 11 — Sezam</title><meta name="description" content="'+esc(description,quote=True)+'"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script><script defer src="/prices.js"></script></head><body>'+nav+'<main id="main" class="wrap '+kind+'">'+body.replace('↗',arrow)+'</main>'+footer+'</body></html>'
 def write(slug,title,description,body,kind='article-page'):
  path=dist/slug;path.mkdir(parents=True,exist_ok=True);(path/'index.html').write_text(page(title,description,body,kind,'/'+slug+'/'))
 def intro(title,description,label='LOMBARD 11 / SEZAM'):
@@ -44,9 +49,16 @@ write('blog','Poradnik i blog','Praktyczne poradniki o złocie, metalach szlache
 metals=[('zlota','Złoto','Au','Skup złota','Biżuteria, złom złota i wyroby ze złota. Sprawdź, jak przygotować się do wyceny.',['Biżuteria: pierścionki, obrączki, łańcuszki i kolczyki.','Uszkodzone wyroby i pojedyncze elementy biżuterii.','Monety oraz sztabki — po indywidualnej weryfikacji.'],[('333','33,3%'),('585','58,5%'),('750','75,0%'),('999','99,9%')]),('srebra','Srebro','Ag','Skup srebra','Srebrna biżuteria, monety i inne wyroby. Przy wycenie liczą się skład oraz masa kruszcu.',['Biżuteria srebrna, również uszkodzona.','Srebrne monety i sztabki — po weryfikacji.','Inne wyroby srebrne po sprawdzeniu składu; przedmioty posrebrzane wymagają osobnej oceny.'],[('800','80,0%'),('835','83,5%'),('925','92,5%'),('999','99,9%')]),('platyny','Platyna','Pt','Skup platyny','Masz przedmiot, który może zawierać platynę? Zacznij od sprawdzenia składu.',['Biżuteria i inne wyroby zawierające platynę — po potwierdzeniu składu.','Przedmioty z oznaczeniem próby, dokumentacją lub certyfikatem, jeśli je posiadasz.','Możliwość przyjęcia konkretnego przedmiotu potwierdzamy indywidualnie.'],[]),('palladu','Pallad','Pd','Skup palladu','Wycena palladu wymaga rozpoznania materiału i zawartości metalu. Skontaktuj się z nami przed wizytą.',['Wyroby i materiały zawierające pallad — po indywidualnej ocenie.','Dostępne oznaczenia i dokumentacja pomagają ustalić zakres weryfikacji.','Nie każdy materiał nadaje się do przyjęcia. Opisz przedmiot i zapytaj o możliwość wyceny.'],[])]
 for slug,name,symbol,title,description,items,rates in metals:
  body=intro(title,description,'SKUP METALI SZLACHETNYCH')+'<div class="service-layout"><section><h2>Co możesz przynieść?</h2><ul class="content-list">'+''.join('<li>'+x+'</li>' for x in items)+'</ul><h2>Jak ustalamy wartość?</h2><p>Sprawdzamy rodzaj materiału, zawartość metalu oraz masę uwzględnianą w rozliczeniu. Cenę i warunki przedstawiamy przed zawarciem transakcji.</p><p>Jeśli skład budzi wątpliwości, zapytaj o <a href="/badanie-spektrometrem/">badanie spektrometrem</a>. Wynik pomiaru wymaga interpretacji, zwłaszcza w przypadku powłok i niejednorodnych wyrobów.</p></section><aside class="metal-summary"><span>'+symbol+'</span><h2>'+name+'</h2><p>Sprawdzenie materiału.<br>Indywidualna wycena.<br>Jasne ustalenia przed sprzedażą.</p><a class="button primary" href="tel:+48601775146">Zapytaj o cenę ↗</a></aside></div>'
- if rates:body+='<section class="service-prices"><h2>Cennik skupu '+slug+'</h2><p>Aktualne stawki potwierdzisz telefonicznie. Nie publikujemy niepotwierdzonych cen.</p><div class="price-card"><table><thead><tr><th scope="col">Próba</th><th scope="col">Zawartość metalu</th><th scope="col">Cena za gram</th></tr></thead><tbody>'+''.join('<tr><th scope="row">'+a+'</th><td>'+b+'</td><td>Zapytaj o cenę</td></tr>' for a,b in rates)+'</tbody></table></div></section>'
+ if rates:
+  metal='gold' if slug=='zlota' else 'silver'
+  if metal=='gold':rates=[(purity,f'{int(purity)/10:.1f}%'.replace('.',',')) for purity in sorted(snapshot['metals']['gold'],key=int)]
+  pricing='<section class="service-prices"><h2>Cennik skupu '+('złota' if metal=='gold' else 'srebra')+'</h2>'+price_status(metal,'live-price-status')+'<div class="price-card">'+price_table(metal,rates)+'</div><p class="price-explanation">Cena za 1 gram wyrobu danej próby. Ostateczna wycena po sprawdzeniu materiału i masy.</p></section>'
+  if metal=='gold':
+   body=intro('Skup złota','Aktualne ceny skupu złota. Biżuteria i złom złota.','METALE SZLACHETNE')+pricing+'<section class="gold-details"><h2>Co przyjmujemy?</h2><p>Biżuterię, także uszkodzoną, oraz monety i sztabki po weryfikacji. Przynieś przedmiot — sprawdzimy próbę, masę i przedstawimy ofertę.</p><a class="text-link" href="/badanie-spektrometrem/">Sprawdź badanie spektrometrem ↗</a></section>'
+  else:body+=pricing
  else:body+='<section><h2>Cena ustalana indywidualnie</h2><p>Stawka zależy od potwierdzonej zawartości metalu i rodzaju materiału. Prześlij zdjęcie oraz opis przedmiotu, aby ustalić następny krok.</p></section>'
- write('skup-'+slug,title,description,body+cta(),'content-page')
+ write('skup-'+slug,title,description,body+cta(),'content-page compact-gold-page' if slug=='zlota' else 'content-page')
+
 category_cards=''.join(category_card(c,i,True) for i,c in enumerate(categories))
 for c in categories:
  body=intro(c['title'],c['description'],'CO PRZYJMUJEMY')+'<section><h2>Jak przygotować się do wizyty?</h2><p>'+esc(c['preparation'])+'</p><h2>Co wpływa na wycenę?</h2><p>Oceniamy stan, kompletność i możliwość dalszej sprzedaży przedmiotu. W przypadku metali szlachetnych sprawdzamy także skład i masę kruszcu.</p><a class="text-link" href="'+esc(c['link'],quote=True)+'">'+esc(c['linkLabel'])+' ↗</a></section>'
