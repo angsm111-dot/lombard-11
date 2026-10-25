@@ -70,7 +70,7 @@ write('co-przyjmujemy/sprzet-i-rowery','Sprzęt i rowery','Sprawdź osobne kateg
 # Reuse complete homepage sections for consistent services and contact details.
 spectro=(templates/'spektrometr.html').read_text()
 spectro=spectro.replace('class="section wrap spectro"','class="section spectro"')
-write('badanie-spektrometrem','Badanie spektrometrem','Sprawdzenie składu metali szlachetnych w Gorzowie Wielkopolskim.',intro('Badanie <em>spektrometrem.</em>','Sprawdzamy skład metalu i omawiamy, co oznacza wynik badania.')+spectro+cta(),'content-page')
+write('badanie-spektrometrem','Badanie spektrometrem','Badanie metali szlachetnych spektrometrem Helmut Fischer GOLDSCOPE SD 300 w Lombardzie Sezam w Gorzowie.',intro('Badanie <em>spektrometrem.</em>','Profesjonalne badanie metali szlachetnych aparaturą Helmut Fischer GOLDSCOPE SD 300.')+spectro+cta(),'content-page')
 offer=(templates/'oferta.html').read_text().replace('class="wrap olx-inner"','class="olx-inner"')
 write('oferta','Na sprzedaż — oferta OLX','Aktualne ogłoszenia Lombardu Sezam: biżuteria, elektronika i inne przedmioty.',intro('Nasza aktualna <em>oferta.</em>','Zdjęcia konkretnych przedmiotów, ceny i dostępność sprawdzisz bezpośrednio na naszym profilu OLX.')+offer,'content-page')
 contact=(templates/'kontakt.html').read_text().replace('class="wrap contact-grid"','class="contact-grid"')
@@ -98,7 +98,7 @@ for file in sorted(dist.rglob('*.html')):
  title=re.search(r'<title>(.*?)</title>',text,re.S).group(1)
  description=re.search(r'<meta name="description" content="([^"]*)"',text).group(1)
  post=article_map.get(route)
- image=origin+(post['image'] if post else '/assets/hero.webp')
+ image=origin+(post['image'] if post else '/assets/fischer-goldscope-sd300.webp' if route=='/badanie-spektrometrem/' else '/assets/hero.webp')
  metadata='<link rel="canonical" href="'+canonical+'"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="Lombard Sezam"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+esc(html.unescape(title),quote=True)+'"><meta property="og:description" content="'+description+'"><meta property="og:url" content="'+canonical+'"><meta property="og:image" content="'+image+'">'
  schemas=[business]
  if post:
