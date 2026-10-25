@@ -54,8 +54,9 @@
         "text": "Napisz lub zadzwoń i opisz, jaki przedmiot chcesz sprawdzić. Ustalimy, czy oferowane badanie odpowiada Twoim potrzebom i co można na jego podstawie stwierdzić."
       }
     ],
-    "image": "/assets/blog-spektrometr.webp",
-    "imageAlt": "Spektrometr do badania metali w pracowni jubilerskiej — zdjęcie ilustracyjne"
+    "image": "/assets/sezam-sd300.webp",
+    "imageAlt": "Spektrometr Helmut Fischer GOLDSCOPE SD 300",
+    "imageCaption": "Helmut Fischer GOLDSCOPE SD 300"
   },
   {
     "id": "phone-sale",
@@ -93,8 +94,8 @@
     "category": "Zakupy w lombardzie",
     "readTime": 4,
     "excerpt": "Złota biżuteria, telefony czy laptop? Sprawdź, jak szukać przedmiotów w ofercie Lombardu Sezam w Gorzowie.",
-    "image": "/assets/hero.webp",
-    "imageAlt": "Zdjęcie ilustracyjne: złota biżuteria",
+    "image": "/assets/blog-zakupy-w-lombardzie.webp",
+    "imageAlt": "Witryna z biżuterią i elektroniką — zdjęcie ilustracyjne",
     "sections": [
       {
         "heading": "Lombard to także miejsce na zakupy",
@@ -126,7 +127,12 @@
         "label": "Kontakt i dojazd",
         "href": "/kontakt/"
       }
-    ]
+    ],
+    "shopLink": {
+      "href": "https://www.olx.pl/oferty/uzytkownik/G2XGE/",
+      "label": "Zobacz aktualne ogłoszenia Lombardu Sezam na OLX",
+      "description": "Sprawdź dostępne przedmioty, zdjęcia i ceny bezpośrednio na naszym profilu."
+    }
   },
   {
     "id": "skup-zlotego-zlomu-gorzow",
@@ -135,8 +141,8 @@
     "category": "Skup złota",
     "readTime": 4,
     "excerpt": "Pęknięty łańcuszek lub pojedynczy kolczyk też może zawierać wartościowy kruszec. Wyjaśniamy, jak przebiega wycena złotego złomu.",
-    "image": "/assets/hero.webp",
-    "imageAlt": "Zdjęcie ilustracyjne: złota biżuteria",
+    "image": "/assets/blog-zloty-zlom.webp",
+    "imageAlt": "Uszkodzona złota biżuteria przygotowana do wyceny — zdjęcie ilustracyjne",
     "sections": [
       {
         "heading": "Co oznacza złoty złom",
@@ -177,8 +183,8 @@
     "category": "Biżuteria",
     "readTime": 4,
     "excerpt": "Rozmiar, próba, masa i stan zapięcia: praktyczna lista pytań przed zakupem złotej biżuterii w Lombardzie Sezam.",
-    "image": "/assets/hero.webp",
-    "imageAlt": "Zdjęcie ilustracyjne: złota biżuteria",
+    "image": "/assets/blog-zakup-bizuterii.webp",
+    "imageAlt": "Złota biżuteria na ekspozytorach jubilerskich — zdjęcie ilustracyjne",
     "sections": [
       {
         "heading": "Biżuteria powinna pasować do Ciebie",
@@ -219,8 +225,8 @@
     "category": "Telefony",
     "readTime": 4,
     "excerpt": "Praktyczna lista kontroli smartfona: ekran, bateria, konta, akcesoria i zgodność z opisem ogłoszenia.",
-    "image": "/assets/blog-telefon.webp",
-    "imageAlt": "Zdjęcie ilustracyjne: telefon i akcesoria",
+    "image": "/assets/blog-zakup-telefonu.webp",
+    "imageAlt": "Sprawdzanie telefonu przed zakupem — zdjęcie ilustracyjne",
     "sections": [
       {
         "heading": "Zacznij od modelu i potrzeb",
@@ -345,8 +351,8 @@
     "category": "Zakupy i oferta",
     "readTime": 4,
     "excerpt": "Od zdjęcia w ogłoszeniu do wizyty w punkcie: podpowiadamy, jak pytać o dostępność i szczegóły konkretnej oferty.",
-    "image": "/assets/blog-telefon.webp",
-    "imageAlt": "Zdjęcie ilustracyjne: telefon i akcesoria",
+    "image": "/assets/blog-zakupy-olx.webp",
+    "imageAlt": "Zakupy online i przygotowana paczka — zdjęcie ilustracyjne",
     "sections": [
       {
         "heading": "Szukaj na właściwym profilu",
@@ -378,7 +384,12 @@
         "label": "Dane punktu",
         "href": "/kontakt/"
       }
-    ]
+    ],
+    "shopLink": {
+      "href": "https://www.olx.pl/oferty/uzytkownik/G2XGE/",
+      "label": "Zobacz aktualne ogłoszenia Lombardu Sezam na OLX",
+      "description": "Sprawdź dostępne przedmioty, zdjęcia i ceny bezpośrednio na naszym profilu."
+    }
   },
   {
     "id": "co-przyjmuje-lombard-gorzow",
@@ -387,8 +398,8 @@
     "category": "Wizyta w lombardzie",
     "readTime": 4,
     "excerpt": "Złoto, telefon, laptop czy rower — sprawdź, jakie informacje pomagają w ocenie przedmiotu przed wizytą w Sezam.",
-    "image": "/assets/hero.webp",
-    "imageAlt": "Zdjęcie ilustracyjne: złota biżuteria",
+    "image": "/assets/blog-przyjmowane-przedmioty.webp",
+    "imageAlt": "Sprzęt elektroniczny i narzędzia — zdjęcie ilustracyjne",
     "sections": [
       {
         "heading": "Zacznij od kategorii przedmiotu",

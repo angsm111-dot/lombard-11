@@ -37,8 +37,11 @@ def intro(title,description,label='LOMBARD SEZAM'):
 def cta():
  return '<aside class="page-cta"><h2>Porozmawiajmy o Twoim przedmiocie.</h2><p>Napisz, zadzwoń lub odwiedź nas przy ul. Pocztowej 11 w Gorzowie Wielkopolskim. Ostateczną wycenę potwierdzamy po obejrzeniu przedmiotu.</p><div class="actions">'+whatsapp()+'<a class="text-link" href="/kontakt/">Dane kontaktowe i dojazd ↗</a></div></aside>'
 for post in posts:
- body='<a class="back-link" href="/blog/">← Wszystkie poradniki</a><div class="article-meta">'+esc(post['category'])+' · '+str(post['readTime'])+' min czytania</div><h1>'+esc(post['title'])+'</h1><p class="page-lead">'+esc(post['excerpt'])+'</p><figure class="article-cover"><img src="'+esc(post['image'])+'" alt="'+esc(post['imageAlt'])+'" width="1200" height="800"><figcaption>Zdjęcie ilustracyjne</figcaption></figure>'
+ body='<a class="back-link" href="/blog/">← Wszystkie poradniki</a><div class="article-meta">'+esc(post['category'])+' · '+str(post['readTime'])+' min czytania</div><h1>'+esc(post['title'])+'</h1><p class="page-lead">'+esc(post['excerpt'])+'</p><figure class="article-cover"><img src="'+esc(post['image'])+'" alt="'+esc(post['imageAlt'])+'" width="1200" height="800"><figcaption>'+esc(post.get('imageCaption','Zdjęcie ilustracyjne'))+'</figcaption></figure>'
  body+=''.join('<section><h2>'+esc(s['heading'])+'</h2><p>'+esc(s['text'])+'</p></section>' for s in post['sections'])
+ if post.get('shopLink'):
+  shop=post['shopLink']
+  body+='<aside class="article-shop-link"><h2>Przejdź prosto do naszej oferty</h2><p>'+esc(shop['description'])+'</p><a class="olx-direct-link" href="'+esc(shop['href'],quote=True)+'" target="_blank" rel="noopener noreferrer"><img src="/assets/olx-logo.svg" alt="OLX" width="98" height="56"><strong>'+esc(shop['label'])+'</strong>'+arrow+'</a><p class="olx-link-address"><a href="'+esc(shop['href'],quote=True)+'" target="_blank" rel="noopener noreferrer"><strong>www.olx.pl/oferty/uzytkownik/G2XGE/</strong></a></p></aside>'
  if post.get('relatedLinks'):
   body+='<aside class="related-reading"><h2>Sprawdź również</h2><ul>'+''.join('<li><a href="'+esc(link['href'],quote=True)+'">'+esc(link['label'])+'</a></li>' for link in post['relatedLinks'])+'</ul></aside>'
  write('blog/'+post['slug'],post['title'],post['excerpt'],body+cta())
