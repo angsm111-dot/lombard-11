@@ -74,7 +74,7 @@ write('badanie-spektrometrem','Badanie spektrometrem','Badanie metali szlachetny
 offer=(templates/'oferta.html').read_text().replace('class="wrap olx-inner"','class="olx-inner"')
 write('oferta','Na sprzedaż — oferta OLX','Aktualne ogłoszenia Lombardu Sezam: biżuteria, elektronika i inne przedmioty.',intro('Nasza aktualna <em>oferta.</em>','Zdjęcia konkretnych przedmiotów, ceny i dostępność sprawdzisz bezpośrednio na naszym profilu OLX.')+offer,'content-page')
 contact=(templates/'kontakt.html').read_text().replace('class="wrap contact-grid"','class="contact-grid"')
-write('kontakt','Kontakt i dojazd','Lombard Sezam, Pocztowa 11, Gorzów Wielkopolski. Telefon i WhatsApp: 601 775 146.',intro('Jesteśmy <em>po sąsiedzku.</em>','Odwiedź nas na Pocztowej 11, zadzwoń lub napisz na WhatsApp.')+contact,'content-page contact-page')
+write('kontakt','Kontakt i dojazd','Lombard Sezam, Pocztowa 11, Gorzów Wielkopolski. Telefon i WhatsApp: 601 775 146.',intro('Kontakt','Dane kontaktowe, godziny otwarcia i dojazd.')+contact,'content-page contact-page')
 # Preserve the existing privacy information, updating the shared shell.
 privacy=dist/'prywatnosc/index.html'
 old=privacy.read_text();body=re.search(r'<main id="main"[^>]*>(.*?)</main>',old,re.S).group(1)
