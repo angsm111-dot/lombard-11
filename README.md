@@ -59,4 +59,4 @@ Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośni
 
 Strona główna jest krótkim wprowadzeniem z odnośnikami do działów; nie zawiera pełnego kontaktu, cennika, listy kategorii ani artykułów. Treść główna: `templates/home.html`. Dedykowane sekcje kontaktu, oferty i spektrometru są w odpowiednich plikach `templates/`, a generator publikuje je tylko na właściwych podstronach.
 
-Menu: Co przyjmujemy → Skup metali szlachetnych → Na sprzedaż → Blog / poradnik → Kontakt. Badanie spektrometrem jest w podmenu metali. Ogólny przegląd metali ma adres `/skup-metali-szlachetnych/`. Cennik i skrypt cen ładowane są na stronach złota i srebra. Dawne linki do sekcji strony głównej przekierowują do odpowiednich podstron.
+Menu: Co przyjmujemy → Skup metali szlachetnych → Na sprzedaż → Badanie spektrometrem → Blog / poradnik → Kontakt. Badanie spektrometrem jest osobną pozycją głównego menu. Ogólny przegląd metali ma adres `/skup-metali-szlachetnych/`. Cennik i skrypt cen ładowane są na stronach złota i srebra. Dawne linki do sekcji strony głównej przekierowują do odpowiednich podstron.
