@@ -10,7 +10,15 @@ def whatsapp(text='Napisz na WhatsApp'):
 posts=json.loads((dist/'data/articles.json').read_text())
 def cards(limit=None):
  return ''.join('<a class="article-card" href="/blog/'+esc(p['slug'])+'/"><div class="article-photo"><img src="'+esc(p['image'])+'" alt="'+esc(p['imageAlt'])+'" width="640" height="426" loading="lazy"></div><div class="article-meta"><span>'+esc(p['category'])+'</span><span>'+str(p['readTime'])+' min czytania</span></div><h3>'+esc(p['title'])+'</h3><p>'+esc(p['excerpt'])+'</p><span class="article-more">Przeczytaj poradnik '+arrow+'</span></a>' for p in (posts if limit is None else posts[:limit]))
+categories=json.loads((dist/'data/categories.json').read_text())
+def category_card(category,index,listing=False):
+ heading='h2' if listing else 'h3'
+ css='service-tile photo-tile' if listing else 'category photo-tile'
+ return '<a class="'+css+'" href="/co-przyjmujemy/'+esc(category['slug'])+'/"><img class="category-photo" src="'+esc(category['image'],quote=True)+'" alt="" width="640" height="426" loading="lazy"><span class="category-number">'+str(index+1).zfill(2)+'</span><div class="category-copy"><'+heading+'>'+esc(category['title'])+'</'+heading+'><p>'+esc(category['summary'])+'</p><span class="category-more">Sprawdź szczegóły '+arrow+'</span></div></a>'
 p=dist/'index.html';source=p.read_text()
+if '<!-- CATEGORY_CARDS_START -->' not in source:
+ source=re.sub(r'<div class="categories">.*?</div>(?=<p class="section-note">)','<!-- CATEGORY_CARDS_START --><div class="categories"></div><!-- CATEGORY_CARDS_END -->',source,flags=re.S)
+source=re.sub(r'<!-- CATEGORY_CARDS_START -->.*?<!-- CATEGORY_CARDS_END -->','<!-- CATEGORY_CARDS_START --><div class="categories">'+''.join(category_card(c,i) for i,c in enumerate(categories))+'</div><!-- CATEGORY_CARDS_END -->',source,flags=re.S)
 if '<!-- BLOG_CARDS_START -->' not in source:source=source.replace('<div id="articles" class="articles"></div>','<!-- BLOG_CARDS_START --><div id="articles" class="articles"></div><!-- BLOG_CARDS_END -->')
 source=re.sub(r'<!-- BLOG_CARDS_START -->.*?<!-- BLOG_CARDS_END -->','<!-- BLOG_CARDS_START --><div id="articles" class="articles">'+cards(3)+'</div><!-- BLOG_CARDS_END -->',source,flags=re.S)
 source=source.replace('↗',arrow);p.write_text(source)
@@ -39,12 +47,14 @@ for slug,name,symbol,title,description,items,rates in metals:
  if rates:body+='<section class="service-prices"><h2>Cennik skupu '+slug+'</h2><p>Aktualne stawki potwierdzisz telefonicznie. Nie publikujemy niepotwierdzonych cen.</p><div class="price-card"><table><thead><tr><th scope="col">Próba</th><th scope="col">Zawartość metalu</th><th scope="col">Cena za gram</th></tr></thead><tbody>'+''.join('<tr><th scope="row">'+a+'</th><td>'+b+'</td><td>Zapytaj o cenę</td></tr>' for a,b in rates)+'</tbody></table></div></section>'
  else:body+='<section><h2>Cena ustalana indywidualnie</h2><p>Stawka zależy od potwierdzonej zawartości metalu i rodzaju materiału. Prześlij zdjęcie oraz opis przedmiotu, aby ustalić następny krok.</p></section>'
  write('skup-'+slug,title,description,body+cta(),'content-page')
-category_data=[('zloto-i-bizuteria','Złoto i biżuteria','Pierścionki, obrączki, łańcuszki, kolczyki, monety i inne wyroby z metali szlachetnych.','Zabierz przedmiot i dostępne informacje o próbie lub pochodzeniu. Nie usuwaj kamieni ani nie stosuj agresywnych środków czyszczących przed wizytą.','/skup-zlota/','Dowiedz się więcej o skupie złota'),('telefony','Telefony','Smartfony i dostępne akcesoria. Wycena zależy między innymi od modelu, sprawności i stanu urządzenia.','Naładuj telefon i zabierz ładowarkę oraz dostępne akcesoria. Przed przekazaniem urządzenia wykonaj kopię danych, usuń blokady kont i kartę SIM.','/blog/przygotowanie-telefonu/','Przeczytaj poradnik przed sprzedażą'),('laptopy-i-elektronika','Laptopy i elektronika','Laptopy, konsole i inne urządzenia elektroniczne — po sprawdzeniu modelu, stanu oraz działania.','Zabierz zasilacz i akcesoria. Zabezpiecz swoje dane, wyloguj prywatne konta i przygotuj urządzenie do sprawdzenia.','/kontakt/','Zapytaj o swoje urządzenie'),('sprzet-i-rowery','Sprzęt i rowery','Elektronarzędzia, sprzęt techniczny oraz rowery. Możliwość przyjęcia potwierdzamy po ocenie przedmiotu.','Przygotuj model, opis stanu i dostępne wyposażenie. Przed wizytą możesz przesłać zdjęcia przez WhatsApp.','/kontakt/','Zapytaj o swój przedmiot')]
-category_cards=''
-for slug,title,desc,preparation,url,label in category_data:
- category_cards+='<a class="service-tile" href="/co-przyjmujemy/'+slug+'/"><h2>'+title+' ↗</h2><p>'+desc+'</p></a>'
- write('co-przyjmujemy/'+slug,title,desc,intro(title,desc,'CO PRZYJMUJEMY')+'<section><h2>Jak przygotować się do wizyty?</h2><p>'+preparation+'</p><h2>Co wpływa na wycenę?</h2><p>Oceniamy stan, kompletność i możliwość dalszej sprzedaży przedmiotu. W przypadku metali szlachetnych sprawdzamy także skład i masę kruszcu.</p><a class="text-link" href="'+url+'">'+label+' ↗</a></section>'+cta())
-write('co-przyjmujemy','Co przyjmujemy','Sprawdź kategorie przedmiotów przyjmowanych w Lombardzie Sezam.',intro('Co możesz do nas <em>przynieść?</em>','Wybierz kategorię, żeby sprawdzić szczegóły i przygotować się do wizyty.')+'<div class="service-tiles">'+category_cards+'</div><p>Możliwość przyjęcia i ofertę potwierdzamy po indywidualnej ocenie przedmiotu.</p>'+cta(),'content-page')
+category_cards=''.join(category_card(c,i,True) for i,c in enumerate(categories))
+for c in categories:
+ body=intro(c['title'],c['description'],'CO PRZYJMUJEMY')+'<section><h2>Jak przygotować się do wizyty?</h2><p>'+esc(c['preparation'])+'</p><h2>Co wpływa na wycenę?</h2><p>Oceniamy stan, kompletność i możliwość dalszej sprzedaży przedmiotu. W przypadku metali szlachetnych sprawdzamy także skład i masę kruszcu.</p><a class="text-link" href="'+esc(c['link'],quote=True)+'">'+esc(c['linkLabel'])+' ↗</a></section>'
+ if c['slug']=='zloto-i-bizuteria':body+='<p><a href="/skup-srebra/">Sprawdź również skup srebra ↗</a></p>'
+ write('co-przyjmujemy/'+c['slug'],c['title'],c['description'],body+cta())
+write('co-przyjmujemy','Co przyjmujemy','Złoto i srebro, telefony, laptopy, elektronika użytkowa, konsole do gier, rowery i sprzęt techniczny.',intro('Co możesz do nas <em>przynieść?</em>','Wybierz kategorię, żeby sprawdzić szczegóły i przygotować się do wizyty.')+'<div class="service-tiles">'+category_cards+'</div><p>Możliwość przyjęcia i ofertę potwierdzamy po indywidualnej ocenie przedmiotu.</p>'+cta(),'content-page')
+# Keep the previously published combined category address available.
+write('co-przyjmujemy/sprzet-i-rowery','Sprzęt i rowery','Sprawdź osobne kategorie rowerów i sprzętu technicznego.',intro('Sprzęt i rowery','Wybierz odpowiednią kategorię, żeby sprawdzić szczegóły.')+'<div class="service-tiles">'+''.join(category_card(c,i,True) for i,c in enumerate(categories) if c['slug'] in ('rowery','sprzet-techniczny'))+'</div>'+cta(),'content-page')
 # Reuse complete homepage sections for consistent services and contact details.
 spectro=re.search(r'<section id="spektrometr".*?</section>',source,re.S).group()
 spectro=spectro.replace('class="section wrap spectro"','class="section spectro"')

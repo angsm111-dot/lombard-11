@@ -42,3 +42,7 @@ Fotografie poradników są wygenerowanymi zdjęciami ilustracyjnymi; nie pokazuj
 Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośnik z ikoną w menu. Każdy wpis ma oddzielną stronę HTML. Generator tworzy canonical, Open Graph, LocalBusiness, BlogPosting, `robots.txt` i `sitemap.xml` dla domeny `https://lombard11.pl`, zgodnie z obecnym przekierowaniem www.
 
 `python3 scripts/package-hosting.py` tworzy paczkę do niezależnego katalogu hostingu. Instrukcja i wynik audytu domeny: `hosting/MIGRACJA.md`. Znaleziono także stary blog WordPress; przed przełączeniem domeny należy zachować jego treści i rozliczyć adresy z `hosting/legacy-url-inventory.csv`. Przygotowanie paczki nie oznacza podłączenia domeny ani wdrożenia na istniejącym hostingu.
+
+## Kafelki przyjmowanych przedmiotów
+
+Źródło kategorii: `dist/data/categories.json`. Generator tworzy z niego siedem kafelków ze zdjęciami na stronie głównej i stronie `/co-przyjmujemy/` oraz osobne podstrony kategorii. Fotografie z prefiksem `kategoria-` są ilustracyjne, wygenerowane do projektu. Wygaszenie obrazu i dopasowanie do tła realizuje CSS. Dawny adres `/co-przyjmujemy/sprzet-i-rowery/` pozostaje dostępny.
