@@ -19,7 +19,7 @@ python3 -m http.server 8000 --directory dist
 
 ## Przyszły system publikacji
 
-Źródło artykułów: `dist/data/articles.json`. Każdy wpis ma stabilne `id`, `slug`, kategorię, zajawkę i sekcje tekstowe. Integracja z centralnym systemem CMS nie jest jeszcze wykonana. Po zmianie danych uruchom `python3 scripts/build.py`, aby wygenerować strony wpisów. Strona główna pobiera listę z tego samego pliku. Treści są escapowane przy generowaniu i renderowane przez textContent w przeglądarce.
+Źródło artykułów: `dist/data/articles.json`. Każdy wpis ma stabilne `id`, `slug`, kategorię, zajawkę i sekcje tekstowe. Integracja z centralnym systemem CMS nie jest jeszcze wykonana. Po zmianie danych uruchom `python3 scripts/build.py`, aby wygenerować strony wpisów. Lista na stronie bloga jest generowana z tego samego pliku. Treści są escapowane przy generowaniu i renderowane przez textContent w przeglądarce.
 
 ## Dane i zasoby
 
@@ -33,7 +33,7 @@ Ewentualny koszt badania, pełna informacja o prywatności i umowa API z przysz�
 
 Każda pozycja menu ma oddzielny adres i plik `index.html`: `/skup-zlota/`, `/skup-srebra/`, `/skup-platyny/`, `/skup-palladu/`, `/co-przyjmujemy/`, `/oferta/`, `/blog/` i `/kontakt/`. Kategorie przedmiotów mają strony w `/co-przyjmujemy/<kategoria>/`, a pojedyncze teksty w `/blog/<slug>/`. Dostępna jest też strona `/badanie-spektrometrem/`.
 
-`python3 scripts/build.py` generuje te strony oraz statyczne karty poradników ze wspólnego pliku `dist/data/articles.json`. Lista artykułów działa bez JavaScript. Wspólne menu i stopka pochodzą ze strony głównej. Nie ma jeszcze połączenia z centralnym CMS.
+`python3 scripts/build.py` generuje te strony oraz statyczne karty poradników ze wspólnego pliku `dist/data/articles.json`. Lista artykułów działa bez JavaScript. Wspólne menu i stopka pochodzą z plików `templates/header.html` i `templates/footer.html`. Nie ma jeszcze połączenia z centralnym CMS.
 
 Fotografie poradników są wygenerowanymi zdjęciami ilustracyjnymi; nie pokazują rzeczywistych urządzeń firmy ani aktualnych przedmiotów w sprzedaży. Ilustracje spektrometru i telefonu znajdują się w `dist/assets/blog-*.webp`.
 
@@ -45,7 +45,7 @@ Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośni
 
 ## Kafelki przyjmowanych przedmiotów
 
-Źródło kategorii: `dist/data/categories.json`. Generator tworzy z niego siedem kafelków ze zdjęciami na stronie głównej i stronie `/co-przyjmujemy/` oraz osobne podstrony kategorii. Fotografie z prefiksem `kategoria-` są ilustracyjne, wygenerowane do projektu. Wygaszenie obrazu i dopasowanie do tła realizuje CSS. Dawny adres `/co-przyjmujemy/sprzet-i-rowery/` pozostaje dostępny.
+Źródło kategorii: `dist/data/categories.json`. Generator tworzy z niego siedem kafelków ze zdjęciami na stronie `/co-przyjmujemy/` oraz osobne podstrony kategorii. Fotografie z prefiksem `kategoria-` są ilustracyjne, wygenerowane do projektu. Wygaszenie obrazu i dopasowanie do tła realizuje CSS. Dawny adres `/co-przyjmujemy/sprzet-i-rowery/` pozostaje dostępny.
 
 ## Integracja cen z panelem Sezam
 
@@ -54,3 +54,9 @@ Blog zawiera 11 artykułów (8 nowych poradników lokalnych) i wyraźny odnośni
 `dist/prices.js` odświeża publiczny cennik co pięć minut oraz po powrocie do karty. Korzysta z CORS, bez poświadczeń. Sprawdza kompletność, poprawność cen i czas źródła; odrzuca dane zapasowe oraz odczyty starsze niż 30 minut. Przy awarii zachowuje wyłącznie świeży, potwierdzony odczyt, a po jego wygaśnięciu pokazuje kontakt zamiast nieaktualnych stawek.
 
 `dist/data/prices.json` jest oznaczonym czasem odczytu snapshotem do renderowania HTML, nie osobnym edytowalnym cennikiem. Skrypt synchronizacji wymaga narzędzia `curl`. Aby odświeżyć go przed budową, uruchom `python3 scripts/sync-prices.py`, a potem `python3 scripts/build.py`. Bez JavaScript widoczny jest zapisany odczyt z jego datą, nie automatyczne aktualizacje. Skrypt nie korzysta z panelu administracyjnego do zapisu.
+
+## Podział na osobne działy
+
+Strona główna jest krótkim wprowadzeniem z odnośnikami do działów; nie zawiera pełnego kontaktu, cennika, listy kategorii ani artykułów. Treść główna: `templates/home.html`. Dedykowane sekcje kontaktu, oferty i spektrometru są w odpowiednich plikach `templates/`, a generator publikuje je tylko na właściwych podstronach.
+
+Menu: Co przyjmujemy → Skup metali szlachetnych → Na sprzedaż → Blog / poradnik → Kontakt. Badanie spektrometrem jest w podmenu metali. Ogólny przegląd metali ma adres `/skup-metali-szlachetnych/`. Cennik i skrypt cen ładowane są na stronach złota i srebra. Dawne linki do sekcji strony głównej przekierowują do odpowiednich podstron.

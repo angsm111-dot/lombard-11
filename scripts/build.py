@@ -16,23 +16,20 @@ def category_card(category,index,listing=False):
  heading='h2' if listing else 'h3'
  css='service-tile photo-tile' if listing else 'category photo-tile'
  return '<a class="'+css+'" href="/co-przyjmujemy/'+esc(category['slug'])+'/"><img class="category-photo" src="'+esc(category['image'],quote=True)+'" alt="" width="640" height="426" loading="lazy"><span class="category-number">'+str(index+1).zfill(2)+'</span><div class="category-copy"><'+heading+'>'+esc(category['title'])+'</'+heading+'><p>'+esc(category['summary'])+'</p><span class="category-more">Sprawdź szczegóły '+arrow+'</span></div></a>'
+templates=root/'templates'
+header=(templates/'header.html').read_text().strip()
+footer=(templates/'footer.html').read_text().strip()
 p=dist/'index.html';source=p.read_text()
-if '<!-- CATEGORY_CARDS_START -->' not in source:
- source=re.sub(r'<div class="categories">.*?</div>(?=<p class="section-note">)','<!-- CATEGORY_CARDS_START --><div class="categories"></div><!-- CATEGORY_CARDS_END -->',source,flags=re.S)
-source=re.sub(r'<!-- CATEGORY_CARDS_START -->.*?<!-- CATEGORY_CARDS_END -->','<!-- CATEGORY_CARDS_START --><div class="categories">'+''.join(category_card(c,i) for i,c in enumerate(categories))+'</div><!-- CATEGORY_CARDS_END -->',source,flags=re.S)
-if '<!-- BLOG_CARDS_START -->' not in source:source=source.replace('<div id="articles" class="articles"></div>','<!-- BLOG_CARDS_START --><div id="articles" class="articles"></div><!-- BLOG_CARDS_END -->')
-source=re.sub(r'<!-- BLOG_CARDS_START -->.*?<!-- BLOG_CARDS_END -->','<!-- BLOG_CARDS_START --><div id="articles" class="articles">'+cards(3)+'</div><!-- BLOG_CARDS_END -->',source,flags=re.S)
-source=re.sub(r'<p class="price-notice"[^>]*>.*?</p>',price_status('gold'),source,flags=re.S)
-source=re.sub(r'<table>.*?</table>',price_table('gold',[('333','33,3%'),('585','58,5%'),('750','75,0%'),('999','99,9%')]),source,count=1,flags=re.S)
-source=source.replace('Łańcuszek, pojedynczy kolczyk, uszkodzony pierścionek? Liczy się zawartość kruszcu. Porozmawiajmy o wycenie Twojego złota.','Aktualne ceny skupu. Wycena po potwierdzeniu próby i masy złota.')
-if '<script src="/prices.js" defer></script>' not in source:source=source.replace('</head>','<script src="/prices.js" defer></script></head>')
-source=source.replace('↗',arrow);p.write_text(source)
-header=source[source.index('<body>')+6:source.index('<main id="main">')].replace('href="#main"','href="#main"')
-footer=source[source.index('<footer'):source.index('</body>')]
+head=source[:source.index('<body>')+6]
+head=head.replace('<script src="/prices.js" defer></script>','')
+home=(templates/'home.html').read_text().replace('↗',arrow)
+source=head+header+'<main id="main">'+home+'</main>'+footer+'</body></html>'
+p.write_text(source)
 def page(title,description,body,kind='article-page',path=None):
  nav=header
  if path:nav=nav.replace('href="'+path+'"','aria-current="page" href="'+path+'"')
- return '<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#783e38"><title>'+esc(title)+' | Lombard 11 — Sezam</title><meta name="description" content="'+esc(description,quote=True)+'"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script><script defer src="/prices.js"></script></head><body>'+nav+'<main id="main" class="wrap '+kind+'">'+body.replace('↗',arrow)+'</main>'+footer+'</body></html>'
+ price_script='<script defer src="/prices.js"></script>' if 'data-price-cell' in body else ''
+ return '<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#783e38"><title>'+esc(title)+' | Lombard 11 — Sezam</title><meta name="description" content="'+esc(description,quote=True)+'"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script>'+price_script+'</head><body>'+nav+'<main id="main" class="wrap '+kind+'">'+body.replace('↗',arrow)+'</main>'+footer+'</body></html>'
 def write(slug,title,description,body,kind='article-page'):
  path=dist/slug;path.mkdir(parents=True,exist_ok=True);(path/'index.html').write_text(page(title,description,body,kind,'/'+slug+'/'))
 def intro(title,description,label='LOMBARD 11 / SEZAM'):
@@ -59,6 +56,9 @@ for slug,name,symbol,title,description,items,rates in metals:
  else:body+='<section><h2>Cena ustalana indywidualnie</h2><p>Stawka zależy od potwierdzonej zawartości metalu i rodzaju materiału. Prześlij zdjęcie oraz opis przedmiotu, aby ustalić następny krok.</p></section>'
  write('skup-'+slug,title,description,body+cta(),'content-page compact-gold-page' if slug=='zlota' else 'content-page')
 
+metal_tiles=''.join('<a class="service-tile" href="/skup-'+slug+'/"><h2>'+title+' ↗</h2><p>'+description+'</p></a>' for slug,name,symbol,title,description,items,rates in metals)
+write('skup-metali-szlachetnych','Skup metali szlachetnych','Skup złota, srebra, platyny i palladu w Gorzowie. Wybierz metal i sprawdź szczegóły.',intro('Skup metali <em>szlachetnych.</em>','Wybierz metal, żeby zobaczyć cennik i informacje o wycenie.')+'<div class="service-tiles">'+metal_tiles+'</div><a class="button primary" href="/badanie-spektrometrem/">Sprawdź badanie spektrometrem ↗</a>','content-page')
+
 category_cards=''.join(category_card(c,i,True) for i,c in enumerate(categories))
 for c in categories:
  body=intro(c['title'],c['description'],'CO PRZYJMUJEMY')+'<section><h2>Jak przygotować się do wizyty?</h2><p>'+esc(c['preparation'])+'</p><h2>Co wpływa na wycenę?</h2><p>Oceniamy stan, kompletność i możliwość dalszej sprzedaży przedmiotu. W przypadku metali szlachetnych sprawdzamy także skład i masę kruszcu.</p><a class="text-link" href="'+esc(c['link'],quote=True)+'">'+esc(c['linkLabel'])+' ↗</a></section>'
@@ -68,12 +68,12 @@ write('co-przyjmujemy','Co przyjmujemy','Złoto i srebro, telefony, laptopy, ele
 # Keep the previously published combined category address available.
 write('co-przyjmujemy/sprzet-i-rowery','Sprzęt i rowery','Sprawdź osobne kategorie rowerów i sprzętu technicznego.',intro('Sprzęt i rowery','Wybierz odpowiednią kategorię, żeby sprawdzić szczegóły.')+'<div class="service-tiles">'+''.join(category_card(c,i,True) for i,c in enumerate(categories) if c['slug'] in ('rowery','sprzet-techniczny'))+'</div>'+cta(),'content-page')
 # Reuse complete homepage sections for consistent services and contact details.
-spectro=re.search(r'<section id="spektrometr".*?</section>',source,re.S).group()
+spectro=(templates/'spektrometr.html').read_text()
 spectro=spectro.replace('class="section wrap spectro"','class="section spectro"')
 write('badanie-spektrometrem','Badanie spektrometrem','Sprawdzenie składu metali szlachetnych w Gorzowie Wielkopolskim.',intro('Badanie <em>spektrometrem.</em>','Sprawdzamy skład metalu i omawiamy, co oznacza wynik badania.')+spectro+cta(),'content-page')
-offer=re.search(r'<section id="oferta".*?</section>',source,re.S).group().replace('class="wrap olx-inner"','class="olx-inner"')
-write('oferta','Aktualna oferta OLX','Aktualne ogłoszenia Lombardu Sezam: biżuteria, elektronika i inne przedmioty.',intro('Nasza aktualna <em>oferta.</em>','Zdjęcia konkretnych przedmiotów, ceny i dostępność sprawdzisz bezpośrednio na naszym profilu OLX.')+offer,'content-page')
-contact=re.search(r'<section id="kontakt".*?</section>',source,re.S).group().replace('class="wrap contact-grid"','class="contact-grid"')
+offer=(templates/'oferta.html').read_text().replace('class="wrap olx-inner"','class="olx-inner"')
+write('oferta','Na sprzedaż — oferta OLX','Aktualne ogłoszenia Lombardu Sezam: biżuteria, elektronika i inne przedmioty.',intro('Nasza aktualna <em>oferta.</em>','Zdjęcia konkretnych przedmiotów, ceny i dostępność sprawdzisz bezpośrednio na naszym profilu OLX.')+offer,'content-page')
+contact=(templates/'kontakt.html').read_text().replace('class="wrap contact-grid"','class="contact-grid"')
 write('kontakt','Kontakt i dojazd','Lombard Sezam, Pocztowa 11, Gorzów Wielkopolski. Telefon i WhatsApp: 601 775 146.',intro('Jesteśmy <em>po sąsiedzku.</em>','Odwiedź nas na Pocztowej 11, zadzwoń lub napisz na WhatsApp.')+contact,'content-page contact-page')
 # Preserve the existing privacy information, updating the shared shell.
 privacy=dist/'prywatnosc/index.html'

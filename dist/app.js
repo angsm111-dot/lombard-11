@@ -47,3 +47,12 @@ if (metalsToggle && metalsMenu) {
 }
 const year = document.querySelector('#year');
 if (year) year.textContent = new Date().getFullYear();
+// Keep previously shared homepage section links useful after splitting the site into pages.
+if (location.pathname === '/') {
+  const destinations = {
+    '#kontakt': '/kontakt/', '#zloto': '/skup-zlota/',
+    '#przyjmujemy': '/co-przyjmujemy/', '#oferta': '/oferta/',
+    '#blog': '/blog/', '#spektrometr': '/badanie-spektrometrem/'
+  };
+  if (destinations[location.hash]) location.replace(destinations[location.hash]);
+}
