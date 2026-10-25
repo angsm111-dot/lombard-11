@@ -29,10 +29,10 @@ def page(title,description,body,kind='article-page',path=None):
  nav=header
  if path:nav=nav.replace('href="'+path+'"','aria-current="page" href="'+path+'"')
  price_script='<script defer src="/prices.js"></script>' if 'data-price-cell' in body else ''
- return '<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#783e38"><title>'+esc(title)+' | Lombard 11 — Sezam</title><meta name="description" content="'+esc(description,quote=True)+'"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script>'+price_script+'</head><body>'+nav+'<main id="main" class="wrap '+kind+'">'+body.replace('↗',arrow)+'</main>'+footer+'</body></html>'
+ return '<!doctype html><html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#783e38"><title>'+esc(title)+' | Lombard SEZAM</title><meta name="description" content="'+esc(description,quote=True)+'"><link rel="icon" href="/assets/favicon.svg"><link rel="stylesheet" href="/style.css"><script defer src="/app.js"></script>'+price_script+'</head><body>'+nav+'<main id="main" class="wrap '+kind+'">'+body.replace('↗',arrow)+'</main>'+footer+'</body></html>'
 def write(slug,title,description,body,kind='article-page'):
  path=dist/slug;path.mkdir(parents=True,exist_ok=True);(path/'index.html').write_text(page(title,description,body,kind,'/'+slug+'/'))
-def intro(title,description,label='LOMBARD 11 / SEZAM'):
+def intro(title,description,label='LOMBARD SEZAM'):
  return '<a class="back-link" href="/">← Strona główna</a><div class="eyebrow">'+label+'</div><h1>'+title+'</h1><p class="page-lead">'+description+'</p>'
 def cta():
  return '<aside class="page-cta"><h2>Porozmawiajmy o Twoim przedmiocie.</h2><p>Napisz, zadzwoń lub odwiedź nas przy ul. Pocztowej 11 w Gorzowie Wielkopolskim. Ostateczną wycenę potwierdzamy po obejrzeniu przedmiotu.</p><div class="actions">'+whatsapp()+'<a class="text-link" href="/kontakt/">Dane kontaktowe i dojazd ↗</a></div></aside>'
@@ -78,15 +78,15 @@ write('kontakt','Kontakt i dojazd','Lombard Sezam, Pocztowa 11, Gorzów Wielkopo
 # Preserve the existing privacy information, updating the shared shell.
 privacy=dist/'prywatnosc/index.html'
 old=privacy.read_text();body=re.search(r'<main id="main"[^>]*>(.*?)</main>',old,re.S).group(1)
-privacy.write_text(page('Prywatność','Informacje o prywatności na stronie Lombard 11.',body,path='/prywatnosc/'))
-(dist/'404.html').write_text(page('Nie znaleziono strony','Wróć do strony głównej Lombard 11.',intro('Tu jeszcze nic nie ma.','Ten adres nie prowadzi do dostępnej strony.')+'<a class="button primary" href="/">Wróć na stronę główną →</a>'))
+privacy.write_text(page('Prywatność','Informacje o prywatności na stronie Lombard SEZAM.',body,path='/prywatnosc/'))
+(dist/'404.html').write_text(page('Nie znaleziono strony','Wróć do strony głównej Lombard SEZAM.',intro('Tu jeszcze nic nie ma.','Ten adres nie prowadzi do dostępnej strony.')+'<a class="button primary" href="/">Wróć na stronę główną →</a>'))
 print('Generated',len(list(dist.rglob('*.html'))),'standalone HTML pages.')
 
 write('pozyczki-pod-zastaw','Pożyczki pod zastaw w Gorzowie','Zapytaj o pożyczkę pod zastaw w Lombardzie Sezam przy Pocztowej 11 w Gorzowie.',intro('Pożyczka pod zastaw.<br><em>Porozmawiajmy o warunkach.</em>','Dla nowych klientów: 5% za miesiąc. Warunki konkretnej umowy przedstawiamy przed jej podpisaniem.')+'<section><h2>Od czego zacząć?</h2><p>Opisz przedmiot lub przynieś go do punktu przy Pocztowej 11 w Gorzowie Wielkopolskim. Sprawdzimy, czy możemy go przyjąć, i przedstawimy ofertę po ocenie jego wartości.</p><h2>Co ustalić przed podpisaniem?</h2><p>Zapytaj o kwotę pożyczki, pełną kwotę do zapłaty, termin oraz zasady odbioru przedmiotu. Oferta 5% za miesiąc dotyczy nowych klientów; szczegóły potwierdzamy w punkcie.</p><h2>Jak przygotować przedmiot?</h2><p>Do elektroniki zabierz dostępne akcesoria i zasilacz. Zabezpiecz swoje dane oraz przygotuj dokument tożsamości potrzebny do zawarcia transakcji. W przypadku biżuterii nie usuwaj kamieni i nie stosuj agresywnych środków czyszczących.</p><a class="text-link" href="/co-przyjmujemy/">Sprawdź, co przyjmujemy ↗</a></section>'+cta(),'content-page')
 
 # Production SEO metadata. The existing domain already redirects www to the apex.
 origin='https://lombard11.pl'
-business={'@context':'https://schema.org','@type':'LocalBusiness','@id':origin+'/#business','name':'Lombard Sezam — Lombard 11','url':origin+'/','telephone':'+48601775146','image':origin+'/assets/hero.webp','address':{'@type':'PostalAddress','streetAddress':'ul. Pocztowa 11','addressLocality':'Gorzów Wielkopolski','postalCode':'66-400','addressCountry':'PL'},'openingHoursSpecification':[{'@type':'OpeningHoursSpecification','dayOfWeek':['Monday','Tuesday','Wednesday','Thursday','Friday'],'opens':'10:00','closes':'18:00'},{'@type':'OpeningHoursSpecification','dayOfWeek':'Saturday','opens':'10:00','closes':'14:00'}]}
+business={'@context':'https://schema.org','@type':'LocalBusiness','@id':origin+'/#business','name':'Lombard SEZAM','url':origin+'/','telephone':'+48601775146','image':origin+'/assets/hero.webp','address':{'@type':'PostalAddress','streetAddress':'ul. Pocztowa 11','addressLocality':'Gorzów Wielkopolski','postalCode':'66-400','addressCountry':'PL'},'openingHoursSpecification':[{'@type':'OpeningHoursSpecification','dayOfWeek':['Monday','Tuesday','Wednesday','Thursday','Friday'],'opens':'10:00','closes':'18:00'},{'@type':'OpeningHoursSpecification','dayOfWeek':'Saturday','opens':'10:00','closes':'14:00'}]}
 article_map={'/blog/'+p['slug']+'/':p for p in posts}
 urls=[]
 for file in sorted(dist.rglob('*.html')):
@@ -99,7 +99,7 @@ for file in sorted(dist.rglob('*.html')):
  description=re.search(r'<meta name="description" content="([^"]*)"',text).group(1)
  post=article_map.get(route)
  image=origin+(post['image'] if post else '/assets/hero.webp')
- metadata='<link rel="canonical" href="'+canonical+'"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="Lombard 11 — Sezam"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+esc(html.unescape(title),quote=True)+'"><meta property="og:description" content="'+description+'"><meta property="og:url" content="'+canonical+'"><meta property="og:image" content="'+image+'">'
+ metadata='<link rel="canonical" href="'+canonical+'"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="Lombard SEZAM"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+esc(html.unescape(title),quote=True)+'"><meta property="og:description" content="'+description+'"><meta property="og:url" content="'+canonical+'"><meta property="og:image" content="'+image+'">'
  schemas=[business]
  if post:
   schemas.append({'@context':'https://schema.org','@type':'BlogPosting','headline':post['title'],'description':post['excerpt'],'mainEntityOfPage':canonical,'image':image,'author':{'@type':'Organization','name':'Lombard Sezam'},'publisher':{'@type':'Organization','name':'PUH SEZAM Sp. z o.o.','logo':{'@type':'ImageObject','url':origin+'/assets/logo.png'}}})
