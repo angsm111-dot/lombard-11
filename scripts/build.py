@@ -98,7 +98,7 @@ for file in sorted(dist.rglob('*.html')):
  title=re.search(r'<title>(.*?)</title>',text,re.S).group(1)
  description=re.search(r'<meta name="description" content="([^"]*)"',text).group(1)
  post=article_map.get(route)
- image=origin+(post['image'] if post else '/assets/fischer-goldscope-sd300.webp' if route=='/badanie-spektrometrem/' else '/assets/hero.webp')
+ image=origin+(post['image'] if post else '/assets/sezam-sd300.webp' if route=='/badanie-spektrometrem/' else '/assets/hero.webp')
  metadata='<link rel="canonical" href="'+canonical+'"><meta property="og:locale" content="pl_PL"><meta property="og:site_name" content="Lombard Sezam"><meta property="og:type" content="'+('article' if post else 'website')+'"><meta property="og:title" content="'+esc(html.unescape(title),quote=True)+'"><meta property="og:description" content="'+description+'"><meta property="og:url" content="'+canonical+'"><meta property="og:image" content="'+image+'">'
  schemas=[business]
  if post:

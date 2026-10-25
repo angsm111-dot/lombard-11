@@ -65,4 +65,4 @@ Menu: Co przyjmujemy → Skup metali szlachetnych → Na sprzedaż → Badanie s
 
 Nazwa widoczna dla klientów i w metadanych to wyłącznie **Lombard Sezam**. „Lombard 11” jest identyfikatorem projektu i domeny, nie nazwą firmy. Nie dodawać go obok logo, w stopce, nagłówkach, opisach, tytułach ani danych strukturalnych. Domeny i nazw repozytorium nie należy z tego powodu zmieniać. Stopka nie zawiera haseł „Przedmioty z wartością” ani „Ludzie, z którymi warto porozmawiać”.
 
-Podstrona badania spektrometrem pokazuje zdjęcie producenta Helmut Fischer GOLDSCOPE SD 300. Źródła zdjęcia i informacji o zastosowaniach marki w urzędach probierczych: `docs/spektrometr-zrodla.md`.
+Podstrona badania spektrometrem pokazuje zatwierdzone zdjęcie Helmut Fischer GOLDSCOPE SD 300 przeniesione bez zmian z projektu Spektrometria / SEZAM LAB. Źródła zdjęcia i informacji o zastosowaniach marki w urzędach probierczych: `docs/spektrometr-zrodla.md`.
