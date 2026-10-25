@@ -14,7 +14,8 @@ Na wyraźną prośbę właściciela podstrona korzysta z tego samego ujęcia co 
 ## Źródła opisu
 
 - Nazwa modelu i zastosowanie XRF: https://sd300.helmut-fischer.com/index
-- Sheffield Assay Office, opis urządzenia Fischer XAN-250: https://www.assayoffice.co.uk/news/investing-in-our-future-sheffield-assay-office
-- Edinburgh Assay Office, opis współpracy z Fischer i wykorzystania XRF: https://www.edinburghassayoffice.co.uk/2024/11/05/success-story-edinburgh-assay-office-and-fischer/
+- Informacja o używaniu urządzeń marki Helmut Fischer w polskich urzędach probierczych: potwierdzenie właściciela po rozmowach telefonicznych z wieloma urzędami, przekazane w tej rozmowie. Nie przedstawiamy tego jako własnej niezależnej weryfikacji Codexa.
 
 Informacja o zastosowaniu marki w urzędach nie oznacza, że każdy urząd używa identycznego modelu ani gwarantuje identyczną dokładność. Nie publikujemy nieudokumentowanego światowego rankingu „najlepszy sprzęt”.
+
+Na prośbę właściciela usunięto publiczną wzmiankę o Wielkiej Brytanii, zagraniczne odnośniki oraz podpis pod zdjęciem. Plik urządzenia ma kanał alfa; usunięto tło i obramowanie elementu HTML, zachowując piksele zdjęcia.
