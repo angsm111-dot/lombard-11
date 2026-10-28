@@ -1,0 +1,21 @@
+{
+  "project": "lombard-11",
+  "commit": "113268d8b9c0fc69774e07446350b6621a23121e",
+  "state": "verified",
+  "phase": "complete",
+  "public_verified": true,
+  "targets": [
+    "preview",
+    "production"
+  ],
+  "disabled_targets": [
+    "production"
+  ],
+  "target": "preview",
+  "operation": "deploy",
+  "document_root_verified": true,
+  "archive_sha256": "9e89ea72df73514cc5cb2541dc1f868239434faef43dd9afc79584b3fe43360e",
+  "remote_verified_files": 64,
+  "observed_commit": "113268d8b9c0fc69774e07446350b6621a23121e",
+  "maintenance": false
+}
