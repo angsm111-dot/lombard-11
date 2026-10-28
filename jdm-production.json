@@ -1,6 +1,6 @@
 {
   "project": "lombard-11",
-  "commit": "aa59bb5025788e7095bbad2bd0dc0ef41959c587",
+  "commit": "dd42f38689b771f0b5985f61080e23de5c08556f",
   "state": "verified",
   "phase": "complete",
   "public_verified": true,
@@ -12,8 +12,8 @@
   "target": "production",
   "operation": "deploy",
   "document_root_verified": true,
-  "archive_sha256": "b116d91a4f7a237c3318ecc0740e5524f42e90af111c7bdd1201b80b604a992b",
-  "remote_verified_files": 63,
-  "observed_commit": "aa59bb5025788e7095bbad2bd0dc0ef41959c587",
-  "maintenance": false
+  "archive_sha256": "15d342e3c23cd4cda05e52af17de062362be78d5a2120dc2176db9f4b88e50f9",
+  "remote_verified_files": 35,
+  "observed_commit": "dd42f38689b771f0b5985f61080e23de5c08556f",
+  "maintenance": true
 }
