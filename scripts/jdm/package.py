@@ -3,7 +3,7 @@ import argparse, hashlib, json, re, shutil, tarfile
 from pathlib import Path
 from datetime import datetime, timezone
 ROOT=Path(__file__).resolve().parents[2]
-def make(output, target, commit, deploy_root, bridge=False):
+def make(output, target, commit, deploy_root, bridge=False, maintenance=False):
     if not re.fullmatch(r'[0-9a-f]{40}',commit): raise ValueError('Full commit SHA required')
     if target not in ('production','preview'): raise ValueError('Unknown target')
     if not re.fullmatch(r'/[A-Za-z0-9_./-]+',deploy_root) or '..' in deploy_root.split('/'): raise ValueError('Invalid confirmed deployment root')
@@ -44,7 +44,21 @@ def make(output, target, commit, deploy_root, bridge=False):
             app=site/'app.js';source=app.read_text().replace("location.pathname === '/'","location.pathname === '/podglad-sezam11/'")
             source=re.sub(r"(['\"])/([a-z-]+/)(['\"])",lambda m:m[1]+'/podglad-sezam11/'+m[2]+m[3],source)
             app.write_text(source)
-    (site/'deployment.json').write_text(json.dumps({'project':'lombard-11','commit':commit,'target':target,'built_at':datetime.now(timezone.utc).isoformat()},indent=2)+'\n')
+    if maintenance:
+        if target!='production': raise ValueError('Preview must always show the complete site')
+        routes=[p.relative_to(site) for p in site.rglob('index.html')]
+        maintenance_html=(site/'maintenance.html').read_text()
+        # Replace only this newly generated local package, never server/WordPress files.
+        shutil.rmtree(site);site.mkdir()
+        (site/'maintenance.html').write_text(maintenance_html)
+        (site/'robots.txt').write_text('User-agent: *\nDisallow: /\n')
+        for route in routes:
+            folder=site/route.parent;folder.mkdir(parents=True,exist_ok=True)
+            levels=len(route.parent.parts)
+            base='__DIR__' if levels==0 else 'dirname(__DIR__, '+str(levels)+')'
+            php='<?php http_response_code(503); header("Content-Type: text/html; charset=utf-8"); header("Cache-Control: no-store, max-age=0"); header("Retry-After: 300"); header("X-Robots-Tag: noindex, nofollow"); readfile('+base+'."/maintenance.html");'
+            (folder/'index.php').write_text(php)
+    (site/'deployment.json').write_text(json.dumps({'project':'lombard-11','commit':commit,'target':target,'maintenance':maintenance,'built_at':datetime.now(timezone.utc).isoformat()},indent=2)+'\n')
     manifest={p.relative_to(site).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(site.rglob('*')) if p.is_file()}
     (site/'SHA256SUMS.json').write_text(json.dumps(manifest,sort_keys=True)+'\n')
     archive=output/'release.tar.gz'

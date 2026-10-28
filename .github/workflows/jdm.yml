@@ -10,9 +10,9 @@ on:
         options: [both, preview, production]
         default: both
       operation:
-        description: Maintenance never starts automatically
+        description: Action (maintenance is controlled persistently in hosting/jdm.json)
         type: choice
-        options: [deploy, inspect, maintenance-on, maintenance-off]
+        options: [deploy, inspect]
         default: deploy
 permissions:
   contents: write

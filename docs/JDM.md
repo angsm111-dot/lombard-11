@@ -1,105 +1,104 @@
-> Aktualny wariant po decyzji właściciela: **php-static**, bez WordPressa w nowej produkcji. Właściciel zezwolił na usunięcie WP; najpierw zachowujemy jego katalog poza publicznym rootem do ewentualnego powrotu. Warianty Nginx/bridge poniżej to historia rozważanych rozwiązań, nie aktywna konfiguracja.
+# Automatyczna publikacja na JDM — Lombard Sezam
 
-# Publikacja lombard11.pl na JDM
+## Stan działający (28 października 2026)
 
-## Stan i granice konfiguracji — 28.10.2026
+- Repozytorium: https://github.com/angsm111-dot/lombard-11, gałąź `main`.
+- Produkcja: **https://lombard11.pl/**.
+- Podgląd JDM: **https://lombard11.pl/podglad-sezam11/**, pełna wersja z noindex i własnymi linkami. Jest publiczny; noindex nie jest hasłem.
+- Starszy prywatny podgląd Sites: https://lombard-11.angsm111.chatgpt.site — zachowany bez zmiany dostępu. Workflow JDM nie aktualizuje tego dodatkowego podglądu Sites.
+- Pierwsza produkcja: commit `aa59bb5025788e7095bbad2bd0dc0ef41959c587`, [udane wdrożenie](https://github.com/angsm111-dot/lombard-11/actions/runs/40733749753). Przesłano i potwierdzono 63 pliki produkcyjne. Podgląd sprawdzono też w przeglądarce przy szerokościach 390 i 1440 px.
 
-Repozytorium `angsm111-dot/lombard-11`, gałąź `main`, statyczna budowa `python3 scripts/build.py`, wynik `dist/`. Bez zależności npm. Utworzono `.github/workflows/jdm.yml`; push do main uruchamia budowę/kontrolę oraz, po uzupełnieniu dostępu i potwierdzeniu ścieżek, publikację. **Na początku obie publikacje są wyłączone**; udana budowa nie jest potwierdzeniem publikacji.
+## Co robi Codex po kolejnej poprawce
 
-Właściciel potwierdził przez screenshot panelu: **web15.jdm.pl:2233**, konto **lombardp**. Nie są to dane przejęte z innego projektu. Panel pokazuje WordPress 6.7.10, PHP 7.4, brak certyfikatu originu i brak kopii roboczej. Publiczne `https://lombard11.pl` odpowiada przez Cloudflare, nadal stroną WordPress z przerwą techniczną. Baza, pliki WP, backupy i poczta nie zostały zmienione.
+1. Zmienia pliki w tym projekcie, uruchamia generator i właściwe kontrole.
+2. Zapisuje commit i wysyła go na `main` GitHuba. Nie wymaga osobnego potwierdzenia publikacji zleconych zmian.
+3. GitHub Actions (`.github/workflows/jdm.yml`) buduje stronę, sprawdza linki, obrazy i testy publikacji. Następnie publikuje najpierw podgląd, potem produkcję.
+4. Codex odczytuje wynik na gałęzi `jdm-status` oraz faktyczny numer commita na publicznej stronie. Nie traktuje samego push ani zielonej budowy jako sukcesu publikacji.
 
-**Niepotwierdzone:** katalog domeny, wydzielone katalogi nowej produkcji/podglądu, hostname podglądu, klucz hosta SSH, autoryzacja, Python 3/tryb SCP/dowiązania na JDM, certyfikat JDM, tryb SSL Cloudflare, reguły Nginx. Nie ustawiaj pól `verified` na podstawie przypuszczenia.
+Budowa: `python3 scripts/build.py`; kontrola: `python3 scripts/jdm/check_site.py`; testy transportu: `python3 -m unittest discover -s tests -v`. Runner instaluje PHP CLI do testów aktualnego backendu. `dist/` jest śledzony w repozytorium; paczki powstają w ignorowanym `build/` i nie zawierają sekretów.
 
-## Dokładne sekrety GitHuba
+## Faktyczne ścieżki i serwer
 
-Miejsce: https://github.com/angsm111-dot/lombard-11/settings/secrets/actions → **New repository secret**. Sekrety repozytorium, nie zwykłe Variables:
+Dane ustalono od nowa z panelu właściciela i rzeczywistego SSH, bez kopiowania dostępu z lombard-gorzow.pl:
 
-| Nazwa | Wartość dla tego projektu |
+| Element | Potwierdzona wartość |
 |---|---|
-| `JDM_SSH_HOST` | `web15.jdm.pl` — potwierdzony w panelu |
-| `JDM_SSH_PORT` | `2233` — potwierdzony w panelu |
-| `JDM_SSH_USER` | `lombardp` — potwierdzony w panelu |
-| `JDM_SSH_PASSWORD` | obecne hasło SFTP/SSH z panelu JDM; nie regenerować bez potrzeby |
-| `JDM_SSH_KNOWN_HOSTS` | pełna linia `[web15.jdm.pl]:2233 ssh-ed25519 AAAA...`, zgodna z odciskiem potwierdzonym przez JDM/BOK |
-| `JDM_SSH_PRIVATE_KEY` | opcjonalna alternatywa dla hasła: nowy klucz wyłącznie tego projektu, publiczna część dodana do authorized_keys tego konta |
+| Serwer SSH | `web15.jdm.pl` |
+| Port | `2233` |
+| Użytkownik | `lombardp` |
+| Katalog konta | `/home/lombardp` |
+| Document root | `/home/lombardp/public_html` |
+| Wersje produkcji | `/home/lombardp/.sezam11-production/releases/` |
+| Aktywna produkcja | `/home/lombardp/.sezam11-production/current` |
+| Wersje podglądu | `/home/lombardp/.sezam11-preview/releases/` |
+| Aktywny podgląd | `/home/lombardp/.sezam11-preview/current` |
 
-Nie trzeba jednocześnie hasła i klucza: klucz ma pierwszeństwo. `sshpass -e` przekazuje hasło przez środowisko procesu, nigdy argument polecenia; nie używamy `set -x`. Pliki z kluczem/known_hosts mają tryb 0600 w tymczasowym katalogu runnera. `GITHUB_TOKEN` jest automatyczny, ze scoped `contents: write`, służy tylko do statusów. Nie dodawać go ręcznie. Nie przechowywać tajnych wartości w plikach projektu ani w wiadomościach.
+Przypisanie domeny do document root potwierdzono własnym losowym plikiem testowym odczytanym przez publiczne HTTPS **przed przygotowaniem katalogów**. `public_html` jest obecnie dowiązaniem do aktywnej produkcji. W każdej wersji produkcyjnej jest jedno kontrolowane dowiązanie `podglad-sezam11` do aktywnego podglądu. Nginx obsługuje statyczne pliki i dowiązania, co potwierdziły testy publiczne.
 
-Zwykłe **Variables** (ta sama sekcja, zakładka Variables): `JDM_PREVIEW_ENABLED` i `JDM_PRODUCTION_ENABLED`; dopiero po przygotowaniu celów ustawić odpowiednie na `true`. Brak wartości = wyłączone. Nie włączać produkcji przed preflight i zachowaniem starego WordPressa.
+Serwer nie ma Pythona; ma PHP i SCP. Aktualny transport: **php-static**, skrypty `scripts/jdm/php_deploy.py`, `remote.php`, `package.py`. PHP działa przez CLI przy wdrożeniu. Sama nowa strona nie potrzebuje PHP ani WordPressa. Nie potrzeba nowego vhosta ani niestandardowej konfiguracji Nginx. JDM ignoruje `.htaccess`; wcześniejsze wzorce Apache/Nginx i bridge nie są instalowane.
 
-## Ustalenie ścieżek i uruchomienie
+## Dokładne sekrety
 
-1. JDM → właściwa strona **lombard11.pl** → dane SFTP/SSH oraz konfiguracja domeny. Potwierdzić rzeczywisty dokument root przez panel/BOK i `pwd -P`, `realpath` po uwierzytelnieniu. Nie zakładać `public_html`, `/home/...` ani katalogów z innych projektów.
-2. Wykonać snapshot/pełny backup plików i bazy starego WP (publiczny eksport wpisów nie wystarcza). Pozostawić starą instalację bez zmian; wskazać możliwość powrotu do jej katalogu.
-3. Utworzyć **nowe, puste, niezależne** katalogi bazowe dla nowej produkcji i podglądu, poza starą instalacją i poza katalogami innych domen. Dla każdego utworzyć `.lombard11-deploy-root`, zawartość dokładnie:
-   - produkcja: `{"project":"lombard-11","domain":"lombard11.pl","target":"production"}`
-   - podgląd: `{"project":"lombard-11","domain":"lombard11.pl","target":"preview"}`
-   Ten znacznik jest świadomym dopuszczeniem danego katalogu; nie tworzyć go w katalogu WP. Skrypt odmawia katalogów z WP, nie nadpisuje zwykłego katalogu `current` ani dowiązań poza `releases`.
-4. Potwierdzone absolutne ścieżki wpisać w `hosting/jdm.json` jako `production_root`, `preview_root`, hostname jako `preview_url`. Potwierdzić `paths_verified_from_panel`. Nie publikować haseł w tym JSON. Katalog domeny ma wskazywać **potwierdzony ROOT/current**. Dopiero przełączenie domeny w panelu/BOK decyduje o nowej stronie; workflow nie edytuje DNS ani konfiguracji innych stron.
-5. Potwierdzić fingerprint SHA-256 klucza serwera niezależnie z JDM (BOK/zweryfikowany panel), zapisać `ssh_host_fingerprint_sha256`. Dopasować ten klucz do `JDM_SSH_KNOWN_HOSTS`. Sam wynik `ssh-keyscan` NIE potwierdza tożsamości serwera; nie używać TOFU ani `StrictHostKeyChecking=no`.
-6. **JDM używa Nginx i nie obsługuje .htaccess.** Poprosić BOK o zastosowanie reguł z `hosting/nginx-production.conf.example` i osobno `hosting/nginx-preview.conf.example`, po zastąpieniu znacznika rzeczywistą ścieżką. Nie wklejać całego przykładowego serwera ani nie zastępować konfiguracji TLS. Potwierdzić obsługę dowiązania `current`, try_files, HTTP 404/503, wyłączenie cache i noindex podglądu. Pole `webserver_rules_verified` oznacza faktyczny test konfiguracji, nie samo wysłanie zgłoszenia.
-7. Włączyć najpierw `JDM_PREVIEW_ENABLED=true`, uruchomić Actions → **JDM build and deploy** → Run workflow → target=preview, operation=deploy. Pierwsza wersja bez poprzednika nie jest automatycznie kasowana po błędzie; zostaje do kontroli. Panel/BOK może po wgraniu pierwszej wersji przełączyć podgląd na `current` i ponowić kontrolę.
-8. Ustawić certyfikat originu, potwierdzić właściwe przekierowania i zachowanie starego bloga (patrz `hosting/MIGRACJA.md`). Dopiero potem włączyć produkcję. Pierwsza zmiana katalogu domeny wymaga czynności w panelu/BOK. Nie usuwać starego WordPressa.
+Miejsce: https://github.com/angsm111-dot/lombard-11/settings/secrets/actions → **New repository secret**.
 
-Dokumentacja JDM: [dlaczego .htaccess nie działa](https://jdm.pl/pomoc/baza-wiedzy/dlaczego-htaccess-nie-dziala/), [panel klienta](https://jdm.pl/pomoc/baza-wiedzy/przeglad-panelu-klienta/). Niestandardowe reguły Nginx uzgadnia się przez Zgłoszenia/BOK.
+| Nazwa | Znaczenie |
+|---|---|
+| `JDM_SSH_PASSWORD` | Jedyny wymagany sekret aktualnego transportu: hasło SSH z panelu JDM, już zapisane przez właściciela. |
+| `JDM_SSH_KNOWN_HOSTS` | Opcjonalne nadpisanie publicznego klucza hosta; musi pasować do przypiętego fingerprintu. Domyślnie używany jest publiczny plik `hosting/ssh_known_hosts`. |
 
-## Przebieg kolejnych aktualizacji
+Klucz publiczny serwera nie jest tajnym kluczem prywatnym ani hasłem. Host/port/login nie są sekretami i znajdują się w konfiguracji potwierdzonego konta. Starsze opcjonalne sekrety `JDM_SSH_HOST`, `JDM_SSH_PORT`, `JDM_SSH_USER`, `JDM_SSH_PRIVATE_KEY` dotyczą historycznego backendu; nie są wymagane i nie sterują aktywnym php-static. Nie trzeba ich dodawać. `GITHUB_TOKEN` jest dostarczany automatycznie i służy tylko do statusów; nie dodawać go ręcznie.
 
-Po zleceniu zmiany Codex edytuje źródła, buduje i sprawdza stronę, zapisuje commit i wysyła na main. Actions:
+Hasło przekazywane przez `sshpass -e`, nigdy argumentem polecenia. Nie zapisujemy go do repozytorium, plików paczki ani logów. Nie włączać `set -x`. Nie generować nowego hasła w JDM bez potrzeby. Zmiana hasła wymaga aktualizacji tylko `JDM_SSH_PASSWORD`.
 
-- globalna kolejka `lombard-11-jdm`, bez przerywania trwającego wdrożenia;
-- `bash -euo pipefail` także przy `tee`;
-- budowa + sprawdzenie lokalnych linków/obrazów + testy wdrożenia;
-- pełne archiwum wszystkich plików dla każdego celu, metadane pełnego SHA commita w HTML i `deployment.json`;
-- pełny SCP przez przypięty SSH (**bez rsync**), kontrola SHA-256 archiwum i każdego pliku na serwerze, kontrola dokładnego zestawu plików i odrzucenie dowiązań/path traversal w tar;
-- nowy niezmienny katalog `releases/COMMIT-RUN-ATTEMPT`, następnie atomowa zamiana dowiązania `current`; dodatkowo blokada `flock` po stronie serwera;
-- TLS-zweryfikowane żądania publicznego `deployment.json`, strony głównej, kontaktu, bloga i oferty, z kontrolą SHA commita w każdej odpowiedzi, HTTP 200 lub 503 zgodnie z flagą przerwy;
-- po niepowodzeniu kontroli publicznej próba powrotu do poprzedniego dowiązania, bez usuwania nowej lub starej wersji. Gdy brak poprzednika — wymagana kontrola pierwszej konfiguracji, nigdy usunięcie danych;
-- zapis wyniku do gałęzi `jdm-status`, weryfikowanej osobno od `main`.
+Produkcję/podgląd włączają `production_enabled` i `preview_enabled` w `hosting/jdm.json`. Można je nadpisać zwykłymi GitHub Variables `JDM_PRODUCTION_ENABLED` i `JDM_PREVIEW_ENABLED` w zakładce Variables (nie Secrets); `false` wyłącza odpowiedni cel. Brak zmiennej oznacza użycie konfiguracji z repozytorium.
 
-Przy każdym runie wykonywany jest również odczytowy audyt DNS, publicznego certyfikatu i `ssh-keyscan`. Wynik trafia do `jdm-audit.json` na gałęzi statusów. Odczytany klucz jest oznaczony jako **niezweryfikowany**; nigdy nie jest automatycznie dodawany do zaufanych.
+## SSH: przypięcie przy pierwszym połączeniu
 
-Statusy `awaiting_configuration`, `failed`, `verified` mają różne znaczenia. `latest.json` zawiera commit, etap, wynik, link do runa i informację `public_verified`; `runs/` zachowuje historię. Osobne ostatnie poprawne wyniki są w `jdm-production.json` i `jdm-preview.json`. Szczegóły błędu odczytać przez GitHub Actions tools z runa, bez proszenia właściciela o screeny. Jeśli GitHub nie pozwoli zapisać workflow lub statusu, zgłosić konkretny błąd uprawnień, nie udawać działania.
+Właściciel polecił kontynuować bez potwierdzenia BOK. Przypięto początkowy klucz ED25519 odczytany podczas audytu:
 
-## Podgląd i przerwa techniczna
+`SHA256:maeVhAooEo6C8SFZn4FP2u5Kz+kOkgxQaw7lvJql8Qc`
 
-Dotychczasowy niezależny prywatny podgląd: https://lombard-11.angsm111.chatgpt.site . Pozostaje aktywny i nie dziedziczy flagi JDM. Nie zmieniać jego dostępu. Automatyczny podgląd JDM będzie miał **osobny potwierdzony hostname i root**; każdy push buduje pełną stronę podglądu. `noindex` nie jest ochroną dostępu; Basic Auth/ograniczenie dostępu uzgodnić osobno w panelu.
+To **trust-on-first-use**, nie niezależne potwierdzenie tożsamości. Ten fakt zapisano w konfiguracji. `StrictHostKeyChecking=yes` i kontrola SHA-256 pozostają włączone. Nowy wynik `ssh-keyscan` nie aktualizuje zaufanego klucza. Przy zmianie klucza wdrożenie ma się zatrzymać do ustalenia przyczyny.
 
-Przerwa: Actions → JDM build and deploy → Run workflow → **target=production** → **maintenance-on** / **maintenance-off**. Tylko jawna dyspozycja właściciela; zwykłe deploy zachowuje dotychczasową flagę i nigdy jej nie włącza. Nginx sprawdza plik `ROOT/maintenance.enabled`, odpowiedź 503 + Retry-After, pełna wersja w podglądzie nadal widoczna. Wyłączenie usuwa wyłącznie tę flagę, nie stronę. Przerwa starego WP jest osobnym mechanizmem.
+## Transfer i kontrola
 
-## Cloudflare i SSL: dwa połączenia
+- Jedna kolejka workflow dla projektu, `cancel-in-progress: false`; dodatkowo `flock` na serwerze.
+- Bash `-euo pipefail`: logowanie przez `tee` nie ukrywa błędów.
+- Pełna paczka SCP przez SSH, bez rsync i bez kopiowania przyrostowego.
+- SHA-256 archiwum i każdego pliku, dokładny zestaw plików, odrzucanie duplikatów nazw, ścieżek poza katalogiem i dowiązań z archiwum.
+- Nowy katalog `releases/COMMIT-RUN-ATTEMPT`; aktywacja przez zamianę dowiązania `current`. Brak automatycznego usuwania starych wersji.
+- Pełny SHA commita w `deployment.json` oraz HTML. Wszystkie lokalne CSS/JS/obrazy mają wersję commita w URL.
+- Publiczna kontrola HTTPS strony głównej, kontaktu, bloga i oferty, zgodności commita oraz checksumów CSS/JS/logo. Produkcja sprawdza też HTTP 404 dla nieznanego adresu. Nie wyłączamy walidacji TLS.
+- Przy błędzie próba przywrócenia poprzedniego `current`. Błąd cofania jest jawnie raportowany, nie zamieniany w sukces. Przy pierwszym cutoverze można przywrócić zachowany katalog WP.
 
-1. Przeglądarka → Cloudflare: publiczny curl z walidacją TLS działa; Cloudflare headers potwierdzają proxy. Certyfikat widziany z tej sesji może być terminowany przez proxy wykonawcze, więc nie jest dowodem certyfikatu JDM.
-2. Cloudflare → JDM: panel właściciela pokazuje **Brak certyfikatu**. Ustalić origin IP z panelu, aktywować Let's Encrypt dla lombard11.pl i www na JDM, sprawdzić ważność, SAN i łańcuch z SNI, np. z runnera `curl --resolve lombard11.pl:443:CONFIRMED_ORIGIN_IP https://lombard11.pl/`. Dla Cloudflare Origin CA użyć oficjalnego zaufanego CA, nigdy `-k`.
-3. Odczytać bieżący tryb SSL/TLS w panelu Cloudflare; dopiero po kontroli originu potwierdzić Full (strict). Publiczne 200 nie potwierdza strict. Nie zmieniać globalnego trybu strefy ani DNS innych usług w ciemno.
-4. Cache Rule: ominąć cache dla właściwej domeny i hostname podglądu (szczególnie deployment.json, HTML i tryb 503); nie polegać wyłącznie na query stringu. Kontrola commita zatrzyma wdrożenie przy starej treści. Nie zmieniać MX/TXT/poczty.
+## Statusy bez kolejnych screenów
 
-[Cloudflare Full (strict): wymagania certyfikatu originu](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full-strict/).
+Gałąź https://github.com/angsm111-dot/lombard-11/tree/jdm-status zawiera:
 
-## Uproszczony odczyt bez zgłoszenia do BOK
+- `latest.json`: ostatni run, etap, wynik, pełny commit, link do Actions;
+- `jdm-production.json` i `jdm-preview.json`: ostatnie pomyślne wyniki danego celu;
+- `runs/RUN-ATTEMPT.json`: historia każdego uruchomienia;
+- `jdm-audit.json`: publiczny DNS/TLS i niezweryfikowany odczyt kluczy;
+- `jdm-inspection.json`: wcześniejszy potwierdzony odczyt SSH.
 
-Po potwierdzeniu klucza SSH można uruchomić operation=inspect. Używa już zapisanego JDM_SSH_PASSWORD oraz przypiętego publicznego klucza; nie wymaga ścieżek wdrożenia, włączenia produkcji, SSL originu ani zmian Nginx. Odczytuje fizyczny katalog konta, realpath public_html (wskazanego jako standard przez oficjalną dokumentację JDM), obecność plików WP i dostępność narzędzi. Nie odczytuje wp-config.php, bazy ani nie zapisuje plików. Odczytany katalog jest kandydatem do powiązania z domeną, nie automatycznym potwierdzeniem document root. Prywatne ścieżki tylko w logu Actions, nie na publicznej gałęzi statusów.
+`verified` + `public_verified=true` + zgodność SHA oznaczają potwierdzone wdrożenie. `failed` oznacza błąd; `awaiting_configuration` brak aktywnego celu. Jeśli run zawiedzie, ostatni poprawny plik per-target może być starszy — trzeba porównać commit z `latest.json` i Actions. Szczegóły błędów Codex odczytuje przez narzędzia Actions z podanego runa, bez żądania screenshotów od właściciela.
 
-Na polecenie właściciela z 28.10.2026 konfigurację SSL pozostawiamy na później. Nie stanowi to potwierdzenia Full (strict). Nie obniżać walidacji TLS w kontrolach publikacji.
+## WordPress i cofnięcie pierwszego przełączenia
 
-## Decyzja właściciela: przypięcie przy pierwszym użyciu
+Właściciel wyraźnie zezwolił na usunięcie WP. Zamiast kasować pliki podczas przełączenia zachowano pełny katalog w:
 
-28.10.2026 właściciel ponownie polecił kontynuować bez potwierdzania klucza przez BOK. Przypięto konkretny początkowy klucz ED25519 z audytu, odcisk SHA256:maeVhAooEo6C8SFZn4FP2u5Kz+kOkgxQaw7lvJql8Qc. Publiczny klucz jest w hosting/ssh_known_hosts; nie jest to sekret ani klucz prywatny. To trust-on-first-use, NIE niezależne potwierdzenie tożsamości. Nie odświeżać pliku automatycznie. StrictHostKeyChecking=yes pozostaje włączone. Sekret known_hosts i host/user/port są opcjonalnymi nadpisaniami; hasło pozostaje wyłącznie w GitHub Secrets. Do czasu skonfigurowania wdrożeń push uruchamia wyłącznie odczyt SSH obok budowy/audytu. Brak zmian strony. SSL i przerwa na koniec, zgodnie z poleceniem.
+`/home/lombardp/.sezam11-wordpress-backup-aa59bb5025788e7095bbad2bd0dc0ef41959c587`
 
-## Aktualny wariant bez zmiany Nginx i bez usuwania WordPressa
+Jest poza publiczną stroną; WordPress nie obsługuje już domeny. Baza, snapshoty, inne domeny i poczta niezmienione. Własny plik `legacy-root.json` wskazuje tę kopię. Przywrócenie katalogu wymaga świadomego cofnięcia migracji; zwykły deploy wraca do poprzedniej wersji statycznej. Nie kasować baz i kopii bez osobnego polecenia.
 
-SSH działa, odczyt potwierdził `/home/lombardp/public_html` z istniejącym WP. Serwer nie ma Pythona, ma PHP i SCP. Wariant `transport=php-bridge` używa PHP 7.4+ do weryfikacji i atomowego przełączenia wersji. Przed zapisaniem katalogów wdrożenia tworzy własny plik z losowym dowodem i odczytuje go przez `https://lombard11.pl/...`; dopiero zgodność treści potwierdza przypisanie domeny do odczytanego katalogu. Nie czyta wp-config ani danych bazy.
+Stare wpisy WordPressa nie zostały automatycznie zaimportowane do nowego bloga. Inwentaryzacja dawnych adresów jest w `hosting/legacy-url-inventory.csv`; eksport publicznych treści i zachowany WP pozwalają przygotować oddzielną migrację SEO. Nowa strona zawiera 11 artykułów.
 
-Wydzielone wersje pod kontem: `.sezam11-preview` i `.sezam11-production`, ze znacznikami projektu. Pełne paczki SCP i SHA-256 wszystkich plików pozostają obowiązkowe. Dowiązania dodane do istniejącego document root: `podglad-sezam11` (podgląd) i `sezam11-static` (zasoby nowej produkcji). Kolizja z istniejącym plikiem lub obcym dowiązaniem zatrzymuje operację. Nic z WP nie jest przenoszone, nadpisywane lub kasowane.
+## SSL odłożony; przerwa aktywowana na nowsze polecenie
 
-Produkcja używa pojedynczego dodatku `wp-content/mu-plugins/sezam11-static.php`, aktywowanego osobną flagą wyłącznie po kontroli pełnej wersji statycznej. Dodatek serwuje HTML tylko dla jawnej listy nowych podstron. Pozostałe adresy, historyczne wpisy, wp-admin i wp-json pozostają obsługiwane przez WP. Zasoby nowej strony mają odrębny prefiks, więc nie nadpisują plików WP. To wariant zgodności z istniejącym hostingiem: HTML jest statyczny, lecz wejście na nową stronę przechodzi przez początkową fazę WordPressa. Nie jest to usunięcie WordPressa ani pełna migracja jego archiwum.
+Zgodnie z poleceniem właściciela nie zmienialiśmy certyfikatów ani trybu Cloudflare. Po udanym przełączeniu właściciel zlecił zaślepkę na produkcji, z pełną stroną podglądu do dalszych poprawek. Publiczne HTTPS działa przez Cloudflare: audyt widzi certyfikat Google Trust Services dla lombard11.pl i *.lombard11.pl. Panel JDM pokazywał brak certyfikatu originu. Nie oznacza to potwierdzenia Full (strict); ten wymaga osobnego testu certyfikatu JDM/SNI i odczytu ustawienia Cloudflare.
 
-Podgląd ma prefiks `/podglad-sezam11/`, poprawione wszystkie lokalne linki, noindex i pełną zawartość. Jest publicznym podglądem pod trudnością niechronionego adresu (nie udawać prywatności); dotychczasowy podgląd Sites pozostaje prywatny. Niezdefiniowane adresy podglądu mogą dziedziczyć odpowiedź starego WP — nie twierdzić, że nowe reguły 404 Nginx zostały zainstalowane. SSL originu oraz tryb przerwy technicznej pozostają odłożone na polecenie właściciela.
+Sterowanie zaślepką: `maintenance_enabled` w `hosting/jdm.json`. `true` publikuje na produkcji wyłącznie zaślepkę i minimalne pliki, **HTTP 503**, `Retry-After: 300`, no-store, noindex. Strony HTML i dane artykułów pełnej wersji nie są publikowane w tej paczce. Nowy backend PHP nie uruchamia WP; mały własny index.php odpowiada za właściwy kod 503. Podgląd zawsze otrzymuje pełne HTML, obrazy i blog, niezależnie od tej flagi. Zwykłe poprawki i push nie zdejmują zaślepki.
 
-## Aktualny plan zatwierdzony przez właściciela: samodzielna strona statyczna
+Włączenie/wyłączenie właściciel zleca tutaj w Codexie. Codex zmienia flagę na true/false, robi commit/push i sprawdza publiczny kod 503/200 oraz commit. Nie ma potrzeby kopiowania plików ani logowania do panelu. Flaga jest wersjonowana w GitHubie; opcje jednorazowe on/off usunięto z workflow, aby następny push nie nadpisywał przypadkowo decyzji. Przy wyłączeniu pełna statyczna wersja wraca przez nowy release bez usuwania kopii WP.
 
-Właściciel zezwolił na usunięcie WordPressa. Nie korzystamy z dodatku MU ani z WP przy wyświetlaniu nowej strony. Po potwierdzeniu podglądu workflow wgrywa produkcyjną paczkę do nowej wersji, sprawdza SHA i publiczny adres etapowy. Następnie zachowuje stary public_html jako `.sezam11-wordpress-backup-COMMIT` w tym samym koncie, poza publicznym katalogiem, i przełącza `public_html` na własne dowiązanie `.sezam11-production/current`. Pliki bazy i poczta pozostają nietknięte. Nie kasujemy kopii ani baz. Taka zamiana wymaga dwóch operacji rename; może wystąpić bardzo krótka przerwa między nimi, nie włączamy przy tym komunikatu technicznego. Gdy zmiana dowiązania zostanie odrzucona przez hosting, stary katalog zostaje przywrócony.
-
-Każda nowa wersja zawiera jedno kontrolowane dowiązanie `podglad-sezam11` do niezależnego podglądu; jego dokładny cel sprawdzany jest oddzielnie od plików SHA-256. Po migracji nie potrzeba Pythona ani PHP do wyświetlania strony — PHP jest tylko narzędziem CLI do publikacji. Weryfikujemy HTTP i pełny commit oraz checksumy publicznych CSS/JS/logo. Pierwsza aktywacja nie usuwa starego katalogu WP; przy błędzie publicznej kontroli przywraca go. Kolejne wdrożenia zmieniają wyłącznie dowiązanie current i wracają do poprzedniej wersji w razie błędu.
-
-Stare adresy wpisów WP nie są automatycznie serwowane po tej migracji. Zachowane są inwentaryzacja i publiczny eksport, a cały WP pozostaje w kopii poza publicznym katalogiem. Przeniesienie archiwalnych tekstów jest osobnym zadaniem SEO. Nowy blog zawiera 11 odrębnych artykułów.
+Wersja www działa, ale po odejściu od WP zwraca 200, nie dawny redirect WordPressa. Canonical w HTML wskazuje https://lombard11.pl. Ewentualny redirect serwerowy www i finalną konfigurację SSL można wykonać w panelu/Cloudflare, bez zmiany poczty.

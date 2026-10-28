@@ -5,8 +5,6 @@
   "preview_url": "https://lombard11.pl/podglad-sezam11",
   "production_root": "/home/lombardp/.sezam11-production",
   "preview_root": "/home/lombardp/.sezam11-preview",
-  "paths_verified_from_panel": false,
-  "webserver_rules_verified": false,
   "webserver": "nginx",
   "ssh_host_fingerprint_sha256": "SHA256:maeVhAooEo6C8SFZn4FP2u5Kz+kOkgxQaw7lvJql8Qc",
   "origin_ip": null,
@@ -24,5 +22,9 @@
   "production_enabled": true,
   "paths_observed_via_ssh": true,
   "document_root_verified_via_public_proof": true,
-  "verification_run": "https://github.com/angsm111-dot/lombard-11/actions/runs/40733251372"
+  "verification_run": "https://github.com/angsm111-dot/lombard-11/actions/runs/40733251372",
+  "static_serving_verified": true,
+  "production_verified_run": "https://github.com/angsm111-dot/lombard-11/actions/runs/40733749753",
+  "maintenance_enabled": true,
+  "maintenance_source": "Explicit owner request to show a maintenance cover on production while keeping the full preview"
 }

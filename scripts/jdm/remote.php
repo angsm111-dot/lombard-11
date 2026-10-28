@@ -34,7 +34,7 @@ try {
     if ($action==='probe' && $standalone) {
         $version=json_decode(file_get_contents($doc.'/deployment.json'),true,512,JSON_THROW_ON_ERROR);
         require_ok($version['project']==='lombard-11' && $version['target']==='production','Wrong active site');
-        $answer=['existing_standalone'=>true,'commit'=>$version['commit']];
+        $answer=['existing_standalone'=>true,'commit'=>$version['commit'],'maintenance'=>!empty($version['maintenance'])];
     } elseif ($action==='probe') {
         require_ok((bool)preg_match('/^[a-f0-9]{40}$/D',$q['commit']),'Bad commit');
         require_ok((bool)preg_match('/^[a-f0-9]{64}$/D',$q['nonce']),'Bad proof');
