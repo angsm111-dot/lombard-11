@@ -1,0 +1,26 @@
+{
+  "project": "lombard-11",
+  "authenticated": true,
+  "read_only": true,
+  "fields": {
+    "ACCOUNT_DIRECTORY": [
+      "/home/lombardp"
+    ],
+    "PYTHON3": [
+      "PHP=/usr/bin/php"
+    ],
+    "SCP": [
+      "/usr/bin/scp"
+    ],
+    "DOCUMENT_ROOT_CANDIDATE": [
+      "/home/lombardp/public_html"
+    ],
+    "PRESENT": [
+      "wp-config.php",
+      "wp-admin",
+      "wp-content",
+      "index.php"
+    ]
+  },
+  "ssh_trust": "first-use pinned; not independently verified"
+}
