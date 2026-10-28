@@ -1,0 +1,57 @@
+{
+  "project": "lombard-11",
+  "checked_at": "2026-10-28T16:51:04.940910+00:00",
+  "origin_tls_verified": false,
+  "cloudflare_ssl_mode_verified": false,
+  "ssh_host_identity_verified": false,
+  "public_addresses": [
+    "104.21.59.33",
+    "172.67.211.240",
+    "2606:4700:3036::ac43:d3f0",
+    "2606:4700:3037::6815:3b21"
+  ],
+  "public_tls": {
+    "verified": true,
+    "issuer": [
+      [
+        [
+          "countryName",
+          "US"
+        ]
+      ],
+      [
+        [
+          "organizationName",
+          "Google Trust Services"
+        ]
+      ],
+      [
+        [
+          "commonName",
+          "WE1"
+        ]
+      ]
+    ],
+    "subject_alt_names": [
+      [
+        "DNS",
+        "lombard11.pl"
+      ],
+      [
+        "DNS",
+        "*.lombard11.pl"
+      ]
+    ],
+    "not_after": "Dec 26 11:46:57 2026 GMT",
+    "scope": "public endpoint only; not JDM origin"
+  },
+  "ssh_discovery": {
+    "unverified_known_hosts": [
+      "[web15.jdm.pl]:2233 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAgT9MpwLB9CPyGjzgkRTDAZFJaemaDfyk2/ZFkNcTEH"
+    ],
+    "unverified_fingerprints": [
+      "256 SHA256:maeVhAooEo6C8SFZn4FP2u5Kz+kOkgxQaw7lvJql8Qc [web15.jdm.pl]:2233 (ED25519)"
+    ],
+    "warning": "Cross-check with JDM before pinning; keyscan does not establish server identity."
+  }
+}
