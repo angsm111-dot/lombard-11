@@ -26,3 +26,11 @@ Cloudflare: publiczny certyfikat nie potwierdza certyfikatu JDM. Nie ogłaszaj F
 ## Obecny stan początkowy (2026-10-28)
 
 Repo i budowa potwierdzone; domena nadal pokazuje starego WordPressa. Screen JDM: `web15.jdm.pl:2233`, użytkownik `lombardp`, **Brak certyfikatu SSL**. Ścieżki, klucz hosta, uwierzytelnienie SSH, nowy podgląd JDM i konfiguracja Nginx niepotwierdzone. Bez aktywnej produkcji JDM. Istniejący prywatny podgląd Sites zachowaj: https://lombard-11.angsm111.chatgpt.site .
+
+### Zmiana po faktycznym połączeniu SSH
+
+Stosuj aktualny `transport=php-bridge` i `scripts/jdm/php_deploy.py` / `remote.php`: serwer nie ma Pythona. Wariant z nowymi vhostami Nginx opisany wyżej jest wcześniejszą propozycją, nie warunkiem obecnego odczytu/publikacji. Domena musi być potwierdzona losowym plikiem odczytanym przez publiczny HTTPS przed przygotowaniem katalogów. WordPress zostaje na miejscu; dodatek MU obsługuje wyłącznie listę nowych stron, zachowując stare adresy WP. Nie zmieniaj SSL ani stanu przerwy na tym etapie. Przypięty klucz jest TOFU na polecenie właściciela, bez niezależnej weryfikacji.
+
+### Nowsza decyzja właściciela — WordPress zbędny
+
+Właściciel wyraźnie zezwolił na kasowanie WordPressa. Aktualny transport to **php-static**: zachowaj starą instalację w kopii poza document root i uruchom samodzielną stronę statyczną przez zarządzane dowiązanie public_html. Nie instaluj bridge/MU. Autoryzacja usunięcia WP nie oznacza usuwania baz, poczty i backupów. SSL oraz przerwa nadal na koniec. Opisany wcześniej wariant bridge nie jest aktywny.

@@ -8,7 +8,7 @@ STATUS=ROOT/'build/jdm-status.json'
 def record(**values):
     data=json.loads(STATUS.read_text()) if STATUS.exists() else {'project':'lombard-11','commit':os.environ.get('GITHUB_SHA'),'checks':[]}
     data.update(values);STATUS.parent.mkdir(exist_ok=True);STATUS.write_text(json.dumps(data,indent=2)+'\n')
-def public_check(url,commit,target,maintenance):
+def public_check(url,commit,target,maintenance,check_missing=True):
     # curl keeps normal TLS validation and proxy trust. Never use -k.
     stamp=f'{time.time_ns()}'
     def fetch(path):
@@ -29,7 +29,7 @@ def public_check(url,commit,target,maintenance):
                 if maintenance and 'data-maintenance="lombard-11"' not in text: raise ValueError('Maintenance page missing')
                 if not maintenance and 'data-maintenance="lombard-11"' in text: raise ValueError('Full version hidden unexpectedly')
                 if target=='preview' and 'name="robots" content="noindex' not in text: raise ValueError('Preview noindex missing')
-            if not maintenance:
+            if not maintenance and check_missing:
                 missing_code,missing_text=fetch('/__lombard11_missing_page__')
                 if missing_code!=404: raise ValueError('Unknown URL must return HTTP 404')
             return {'public_verified':True,'observed_commit':commit,'maintenance':maintenance}
@@ -105,6 +105,10 @@ def run(target,operation):
 
 if __name__=='__main__':
     p=argparse.ArgumentParser();p.add_argument('--target',choices=['production','preview'],required=True);p.add_argument('--operation',choices=['deploy','maintenance-on','maintenance-off'],default='deploy');a=p.parse_args()
-    try: run(a.target,a.operation)
+    try:
+        if json.loads((ROOT/'hosting/jdm.json').read_text()).get('transport')in ('php-bridge','php-static'):
+            from php_deploy import run as php_run
+            php_run(a.target,a.operation)
+        else: run(a.target,a.operation)
     except Exception as exc:
         record(state='failed',error=str(exc));raise

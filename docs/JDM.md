@@ -1,3 +1,5 @@
+> Aktualny wariant po decyzji właściciela: **php-static**, bez WordPressa w nowej produkcji. Właściciel zezwolił na usunięcie WP; najpierw zachowujemy jego katalog poza publicznym rootem do ewentualnego powrotu. Warianty Nginx/bridge poniżej to historia rozważanych rozwiązań, nie aktywna konfiguracja.
+
 # Publikacja lombard11.pl na JDM
 
 ## Stan i granice konfiguracji — 28.10.2026
@@ -83,3 +85,21 @@ Na polecenie właściciela z 28.10.2026 konfigurację SSL pozostawiamy na późn
 ## Decyzja właściciela: przypięcie przy pierwszym użyciu
 
 28.10.2026 właściciel ponownie polecił kontynuować bez potwierdzania klucza przez BOK. Przypięto konkretny początkowy klucz ED25519 z audytu, odcisk SHA256:maeVhAooEo6C8SFZn4FP2u5Kz+kOkgxQaw7lvJql8Qc. Publiczny klucz jest w hosting/ssh_known_hosts; nie jest to sekret ani klucz prywatny. To trust-on-first-use, NIE niezależne potwierdzenie tożsamości. Nie odświeżać pliku automatycznie. StrictHostKeyChecking=yes pozostaje włączone. Sekret known_hosts i host/user/port są opcjonalnymi nadpisaniami; hasło pozostaje wyłącznie w GitHub Secrets. Do czasu skonfigurowania wdrożeń push uruchamia wyłącznie odczyt SSH obok budowy/audytu. Brak zmian strony. SSL i przerwa na koniec, zgodnie z poleceniem.
+
+## Aktualny wariant bez zmiany Nginx i bez usuwania WordPressa
+
+SSH działa, odczyt potwierdził `/home/lombardp/public_html` z istniejącym WP. Serwer nie ma Pythona, ma PHP i SCP. Wariant `transport=php-bridge` używa PHP 7.4+ do weryfikacji i atomowego przełączenia wersji. Przed zapisaniem katalogów wdrożenia tworzy własny plik z losowym dowodem i odczytuje go przez `https://lombard11.pl/...`; dopiero zgodność treści potwierdza przypisanie domeny do odczytanego katalogu. Nie czyta wp-config ani danych bazy.
+
+Wydzielone wersje pod kontem: `.sezam11-preview` i `.sezam11-production`, ze znacznikami projektu. Pełne paczki SCP i SHA-256 wszystkich plików pozostają obowiązkowe. Dowiązania dodane do istniejącego document root: `podglad-sezam11` (podgląd) i `sezam11-static` (zasoby nowej produkcji). Kolizja z istniejącym plikiem lub obcym dowiązaniem zatrzymuje operację. Nic z WP nie jest przenoszone, nadpisywane lub kasowane.
+
+Produkcja używa pojedynczego dodatku `wp-content/mu-plugins/sezam11-static.php`, aktywowanego osobną flagą wyłącznie po kontroli pełnej wersji statycznej. Dodatek serwuje HTML tylko dla jawnej listy nowych podstron. Pozostałe adresy, historyczne wpisy, wp-admin i wp-json pozostają obsługiwane przez WP. Zasoby nowej strony mają odrębny prefiks, więc nie nadpisują plików WP. To wariant zgodności z istniejącym hostingiem: HTML jest statyczny, lecz wejście na nową stronę przechodzi przez początkową fazę WordPressa. Nie jest to usunięcie WordPressa ani pełna migracja jego archiwum.
+
+Podgląd ma prefiks `/podglad-sezam11/`, poprawione wszystkie lokalne linki, noindex i pełną zawartość. Jest publicznym podglądem pod trudnością niechronionego adresu (nie udawać prywatności); dotychczasowy podgląd Sites pozostaje prywatny. Niezdefiniowane adresy podglądu mogą dziedziczyć odpowiedź starego WP — nie twierdzić, że nowe reguły 404 Nginx zostały zainstalowane. SSL originu oraz tryb przerwy technicznej pozostają odłożone na polecenie właściciela.
+
+## Aktualny plan zatwierdzony przez właściciela: samodzielna strona statyczna
+
+Właściciel zezwolił na usunięcie WordPressa. Nie korzystamy z dodatku MU ani z WP przy wyświetlaniu nowej strony. Po potwierdzeniu podglądu workflow wgrywa produkcyjną paczkę do nowej wersji, sprawdza SHA i publiczny adres etapowy. Następnie zachowuje stary public_html jako `.sezam11-wordpress-backup-COMMIT` w tym samym koncie, poza publicznym katalogiem, i przełącza `public_html` na własne dowiązanie `.sezam11-production/current`. Pliki bazy i poczta pozostają nietknięte. Nie kasujemy kopii ani baz. Taka zamiana wymaga dwóch operacji rename; może wystąpić bardzo krótka przerwa między nimi, nie włączamy przy tym komunikatu technicznego. Gdy zmiana dowiązania zostanie odrzucona przez hosting, stary katalog zostaje przywrócony.
+
+Każda nowa wersja zawiera jedno kontrolowane dowiązanie `podglad-sezam11` do niezależnego podglądu; jego dokładny cel sprawdzany jest oddzielnie od plików SHA-256. Po migracji nie potrzeba Pythona ani PHP do wyświetlania strony — PHP jest tylko narzędziem CLI do publikacji. Weryfikujemy HTTP i pełny commit oraz checksumy publicznych CSS/JS/logo. Pierwsza aktywacja nie usuwa starego katalogu WP; przy błędzie publicznej kontroli przywraca go. Kolejne wdrożenia zmieniają wyłącznie dowiązanie current i wracają do poprzedniej wersji w razie błędu.
+
+Stare adresy wpisów WP nie są automatycznie serwowane po tej migracji. Zachowane są inwentaryzacja i publiczny eksport, a cały WP pozostaje w kopii poza publicznym katalogiem. Przeniesienie archiwalnych tekstów jest osobnym zadaniem SEO. Nowy blog zawiera 11 odrębnych artykułów.

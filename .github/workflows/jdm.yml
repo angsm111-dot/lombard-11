@@ -36,6 +36,8 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           persist-credentials: false
+      - name: Prepare deployment test tools
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq php-cli sshpass
       - name: Build and validate
         run: |
           mkdir -p build
@@ -52,6 +54,12 @@ jobs:
           targets=['preview','production'] if os.environ['TARGET']=='both' else [os.environ['TARGET']]
           if os.environ['OPERATION'] not in ('deploy','inspect') and targets!=['production']:
               raise SystemExit('Maintenance requires target=production')
+          config=json.loads(Path('hosting/jdm.json').read_text())
+          for t in ('production','preview'):
+              key='JDM_'+t.upper()+'_ENABLED'
+              if not os.environ.get(key) and config.get(t+'_enabled'):
+                  os.environ[key]='true'
+                  with open(os.environ['GITHUB_ENV'],'a') as output: output.write(key+'=true\n')
           enabled=all(os.environ.get('JDM_'+t.upper()+'_ENABLED')=='true' for t in targets)
           Path('build/jdm-status.json').write_text(json.dumps({'project':'lombard-11','commit':os.environ['GITHUB_SHA'],'state':'ready' if enabled else 'awaiting_configuration','phase':'configuration-gate','public_verified':False,'targets':targets,'disabled_targets':[t for t in targets if os.environ.get('JDM_'+t.upper()+'_ENABLED')!='true']})+'\n')
           if not enabled:

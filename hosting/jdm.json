@@ -2,9 +2,9 @@
   "project": "lombard-11",
   "repository": "angsm111-dot/lombard-11",
   "production_url": "https://lombard11.pl",
-  "preview_url": null,
-  "production_root": null,
-  "preview_root": null,
+  "preview_url": "https://lombard11.pl/podglad-sezam11",
+  "production_root": "/home/lombardp/.sezam11-production",
+  "preview_root": "/home/lombardp/.sezam11-preview",
   "paths_verified_from_panel": false,
   "webserver_rules_verified": false,
   "webserver": "nginx",
@@ -17,5 +17,10 @@
   "ssh_user": "lombardp",
   "ssh_source": "Owner screenshot of JDM access panel, 2026-10-28; not yet authenticated",
   "ssh_host_key_trust": "first-use pin from initial 2026-10-28 audit; owner requested proceeding without JDM confirmation",
-  "ssh_host_identity_independently_verified": false
+  "ssh_host_identity_independently_verified": false,
+  "transport": "php-static",
+  "document_root": "/home/lombardp/public_html",
+  "preview_enabled": true,
+  "production_enabled": false,
+  "paths_observed_via_ssh": true
 }
