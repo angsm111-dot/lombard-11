@@ -34,6 +34,8 @@ def make(output, target, commit, deploy_root, bridge=False):
                 source=source.replace('src="/','src="/sezam11-static/')
                 for asset in ('style.css','assets/'):
                     source=source.replace('href="/'+asset,'href="/sezam11-static/'+asset)
+        # Version assets so browser/CDN caches cannot hide subsequent updates.
+        source=re.sub(r'(src|href)="(/[^"?]+\.(?:css|js|png|webp|jpg|jpeg|svg))"',lambda m:m[1]+'="'+m[2]+'?v='+commit+'"',source)
         page.write_text(source)
     if bridge:
         prefix='/podglad-sezam11' if target=='preview' else '/sezam11-static'

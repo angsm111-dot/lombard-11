@@ -38,10 +38,10 @@ try {
     } elseif ($action==='probe') {
         require_ok((bool)preg_match('/^[a-f0-9]{40}$/D',$q['commit']),'Bad commit');
         require_ok((bool)preg_match('/^[a-f0-9]{64}$/D',$q['nonce']),'Bad proof');
-        $path=$doc.'/sezam11-proof-'.$q['commit'].'.txt';
+        $path=$doc.'/sezam11-proof-'.$q['commit'].'-'.substr($q['nonce'],0,12).'.txt';
         if (file_exists($path)) { require_ok(file_get_contents($path)===$q['nonce'],'Probe collision'); }
         else { $handle=fopen($path,'x');require_ok($handle!==false,'Cannot create isolated domain proof');fwrite($handle,$q['nonce']);fclose($handle);chmod($path,0644); }
-        $answer=['proof_path'=>'/sezam11-proof-'.$q['commit'].'.txt'];
+        $answer=['proof_path'=>'/sezam11-proof-'.$q['commit'].'-'.substr($q['nonce'],0,12).'.txt'];
     } else {
         $target=$q['target'];require_ok(in_array($target,['production','preview'],true),'Invalid target');
         $root=safe_root($q['root']);require_ok($root===$account.'/.sezam11-'.$target,'Root must be isolated in the verified account');
