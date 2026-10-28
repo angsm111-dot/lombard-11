@@ -73,3 +73,9 @@ Przerwa: Actions → JDM build and deploy → Run workflow → **target=producti
 4. Cache Rule: ominąć cache dla właściwej domeny i hostname podglądu (szczególnie deployment.json, HTML i tryb 503); nie polegać wyłącznie na query stringu. Kontrola commita zatrzyma wdrożenie przy starej treści. Nie zmieniać MX/TXT/poczty.
 
 [Cloudflare Full (strict): wymagania certyfikatu originu](https://developers.cloudflare.com/ssl/origin-configuration/ssl-modes/full-strict/).
+
+## Uproszczony odczyt bez zgłoszenia do BOK
+
+Po potwierdzeniu klucza SSH można uruchomić operation=inspect. Używa już zapisanego JDM_SSH_PASSWORD oraz przypiętego publicznego klucza; nie wymaga ścieżek wdrożenia, włączenia produkcji, SSL originu ani zmian Nginx. Odczytuje fizyczny katalog konta, realpath public_html (wskazanego jako standard przez oficjalną dokumentację JDM), obecność plików WP i dostępność narzędzi. Nie odczytuje wp-config.php, bazy ani nie zapisuje plików. Odczytany katalog jest kandydatem do powiązania z domeną, nie automatycznym potwierdzeniem document root. Prywatne ścieżki tylko w logu Actions, nie na publicznej gałęzi statusów.
+
+Na polecenie właściciela z 28.10.2026 konfigurację SSL pozostawiamy na później. Nie stanowi to potwierdzenia Full (strict). Nie obniżać walidacji TLS w kontrolach publikacji.
