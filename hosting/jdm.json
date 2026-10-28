@@ -1,0 +1,19 @@
+{
+  "project": "lombard-11",
+  "repository": "angsm111-dot/lombard-11",
+  "production_url": "https://lombard11.pl",
+  "preview_url": null,
+  "production_root": null,
+  "preview_root": null,
+  "paths_verified_from_panel": false,
+  "webserver_rules_verified": false,
+  "webserver": "nginx",
+  "ssh_host_fingerprint_sha256": null,
+  "origin_ip": null,
+  "origin_tls_verified": false,
+  "cloudflare_ssl_mode_verified": false,
+  "ssh_host": "web15.jdm.pl",
+  "ssh_port": 2233,
+  "ssh_user": "lombardp",
+  "ssh_source": "Owner screenshot of JDM access panel, 2026-10-28; not yet authenticated"
+}

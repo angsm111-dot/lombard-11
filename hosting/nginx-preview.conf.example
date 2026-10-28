@@ -1,0 +1,12 @@
+# JDM/BOK: ONLY a separate, confirmed preview hostname and directory.
+root __CONFIRMED_ROOT__/current;
+index index.html;
+autoindex off;
+error_page 404 /404.html;
+add_header Cache-Control "no-store, max-age=0" always;
+add_header X-Robots-Tag "noindex, nofollow, noarchive" always;
+location / { try_files $uri $uri/ =404; }
+location ~ /\. { deny all; }
+location ~ \.php$ { return 404; }
+# No maintenance flag or production redirect here.
+# Add Basic Auth/access restriction separately if required; noindex is not privacy.

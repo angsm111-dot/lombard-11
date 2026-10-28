@@ -1,0 +1,93 @@
+name: JDM build and deploy
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Target (maintenance is production only)
+        type: choice
+        options: [both, preview, production]
+        default: both
+      operation:
+        description: Maintenance never starts automatically
+        type: choice
+        options: [deploy, maintenance-on, maintenance-off]
+        default: deploy
+permissions:
+  contents: write
+concurrency:
+  group: lombard-11-jdm
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    defaults:
+      run:
+        shell: bash --noprofile --norc -euo pipefail {0}
+    env:
+      OPERATION: ${{ inputs.operation || 'deploy' }}
+      TARGET: ${{ inputs.target || 'both' }}
+      JDM_PRODUCTION_ENABLED: ${{ vars.JDM_PRODUCTION_ENABLED }}
+      JDM_PREVIEW_ENABLED: ${{ vars.JDM_PREVIEW_ENABLED }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Build and validate
+        run: |
+          mkdir -p build
+          python3 scripts/build.py 2>&1 | tee build/build.log
+          python3 scripts/jdm/check_site.py 2>&1 | tee -a build/build.log
+          python3 -m unittest discover -s tests -v 2>&1 | tee -a build/build.log
+      - name: Inspect public DNS, TLS and unverified SSH host keys
+        run: python3 scripts/jdm/audit.py
+      - name: Record configuration gate
+        run: |
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          targets=['preview','production'] if os.environ['TARGET']=='both' else [os.environ['TARGET']]
+          if os.environ['OPERATION']!='deploy' and targets!=['production']:
+              raise SystemExit('Maintenance requires target=production')
+          enabled=all(os.environ.get('JDM_'+t.upper()+'_ENABLED')=='true' for t in targets)
+          Path('build/jdm-status.json').write_text(json.dumps({'project':'lombard-11','commit':os.environ['GITHUB_SHA'],'state':'ready' if enabled else 'awaiting_configuration','phase':'configuration-gate','public_verified':False,'targets':targets,'disabled_targets':[t for t in targets if os.environ.get('JDM_'+t.upper()+'_ENABLED')!='true']})+'\n')
+          if not enabled:
+              with open(os.environ['GITHUB_STEP_SUMMARY'],'a') as out:
+                  out.write('## Not deployed\nJDM target not enabled. Build is checked; no production transfer took place. See docs/JDM.md.\n')
+          PY
+      - name: Install password authentication helper
+        if: success() && (env.JDM_PRODUCTION_ENABLED == 'true' || env.JDM_PREVIEW_ENABLED == 'true')
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
+      - name: Deploy preview (complete version)
+        if: success() && env.OPERATION == 'deploy' && (env.TARGET == 'both' || env.TARGET == 'preview') && env.JDM_PREVIEW_ENABLED == 'true'
+        env:
+          JDM_SSH_HOST: ${{ secrets.JDM_SSH_HOST }}
+          JDM_SSH_PORT: ${{ secrets.JDM_SSH_PORT }}
+          JDM_SSH_USER: ${{ secrets.JDM_SSH_USER }}
+          JDM_SSH_PRIVATE_KEY: ${{ secrets.JDM_SSH_PRIVATE_KEY }}
+          JDM_SSH_PASSWORD: ${{ secrets.JDM_SSH_PASSWORD }}
+          JDM_SSH_KNOWN_HOSTS: ${{ secrets.JDM_SSH_KNOWN_HOSTS }}
+        run: |
+          python3 scripts/jdm/deploy.py --target preview 2>&1 | tee build/preview.log
+          cp build/jdm-status.json build/jdm-preview.json
+      - name: Deploy or maintain production
+        if: success() && (env.TARGET == 'both' || env.TARGET == 'production') && env.JDM_PRODUCTION_ENABLED == 'true'
+        env:
+          JDM_SSH_HOST: ${{ secrets.JDM_SSH_HOST }}
+          JDM_SSH_PORT: ${{ secrets.JDM_SSH_PORT }}
+          JDM_SSH_USER: ${{ secrets.JDM_SSH_USER }}
+          JDM_SSH_PRIVATE_KEY: ${{ secrets.JDM_SSH_PRIVATE_KEY }}
+          JDM_SSH_PASSWORD: ${{ secrets.JDM_SSH_PASSWORD }}
+          JDM_SSH_KNOWN_HOSTS: ${{ secrets.JDM_SSH_KNOWN_HOSTS }}
+        run: |
+          python3 scripts/jdm/deploy.py --target production --operation "$OPERATION" 2>&1 | tee build/production.log
+          cp build/jdm-status.json build/jdm-production.json
+      - name: Save deployment result on jdm-status
+        if: always()
+        env:
+          GH_STATUS_TOKEN: ${{ github.token }}
+          WORKFLOW_RESULT: ${{ job.status }}
+        run: python3 scripts/jdm/status.py

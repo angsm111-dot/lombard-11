@@ -72,3 +72,7 @@ Podstrona badania spektrometrem pokazuje zatwierdzone zdjęcie Helmut Fischer GO
 Każdy z 11 artykułów ma inny plik obrazu, wspólny dla karty na liście i zdjęcia w tekście. Sześć nowych ilustracji zapisano w lekkim WebP; zdjęcie spektrometru jest zatwierdzonym ujęciem z projektu Sezam Lab i ma własny podpis. Generator obsługuje opcjonalne `imageCaption` oraz `shopLink` do wyraźnych, pogrubionych linków kierujących bezpośrednio do ogłoszeń firmy na OLX.
 
 Przekrzywiony kafel na stronie `/oferta/` jest klikalny, ma turkusowe tło i logo OLX. Źródło logo: `docs/olx-logo.md`.
+
+## Automatyczna publikacja JDM
+
+Konfiguracja: [docs/JDM.md](docs/JDM.md), zasady dalszej pracy: [AGENTS.md](AGENTS.md). Workflow `.github/workflows/jdm.yml` buduje i sprawdza każdy push do main, a po potwierdzeniu dostępu i katalogów wysyła pełne paczki przez SSH/SCP, weryfikuje SHA-256 i publiczny commit. Wyniki: osobna gałąź `jdm-status`. Nie używa rsync ani nie usuwa starego WordPressa. Oba cele JDM początkowo wyłączone do uzupełnienia konfiguracji; istniejący prywatny podgląd Sites pozostaje dostępny.

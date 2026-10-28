@@ -1,3 +1,5 @@
+> Aktualizacja 28.10.2026: hosting potwierdzony jako **JDM**, serwer `web15.jdm.pl:2233`, login `lombardp`. JDM używa Nginx i ignoruje `.htaccess`; nie instalować reguł Apache na JDM. Nowa konfiguracja automatyzacji i brakujące dane: [../docs/JDM.md](../docs/JDM.md). Poniższa inwentaryzacja historyczna nadal opisuje starą stronę; nie jest potwierdzeniem wykonania migracji.
+
 # Lombard11.pl — przygotowanie podmiany strony
 
 ## Stan sprawdzony 24 października 2026
