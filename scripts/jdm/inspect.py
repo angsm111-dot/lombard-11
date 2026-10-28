@@ -7,7 +7,7 @@ config=json.loads((ROOT/'hosting/jdm.json').read_text())
 expected=config.get('ssh_host_fingerprint_sha256')
 if not expected: raise SystemExit('Awaiting explicit SSH host-key confirmation; password was not sent.')
 with tempfile.TemporaryDirectory() as temp:
-    known=Path(temp)/'known_hosts';known.write_text(os.environ['JDM_SSH_KNOWN_HOSTS'].strip()+'\n');known.chmod(0o600)
+    known=Path(temp)/'known_hosts';known.write_text((os.environ.get('JDM_SSH_KNOWN_HOSTS') or (ROOT/'hosting/ssh_known_hosts').read_text()).strip()+'\n');known.chmod(0o600)
     result=subprocess.run(['ssh-keygen','-lf',str(known),'-E','sha256'],capture_output=True,text=True,check=True)
     values=[line.split()[1] for line in result.stdout.splitlines()]
     if not values or any(value!=expected for value in values): raise SystemExit('SSH fingerprint mismatch; password was not sent.')
@@ -27,6 +27,15 @@ fi
 '''
     args=['sshpass','-e','ssh','-p',str(config['ssh_port']),'-o','BatchMode=no','-o','PreferredAuthentications=password','-o','PubkeyAuthentication=no','-o','NumberOfPasswordPrompts=1','-o','StrictHostKeyChecking=yes','-o','UserKnownHostsFile='+str(known),'-o','ConnectTimeout=20',config['ssh_user']+'@'+config['ssh_host'],'bash -s']
     completed=subprocess.run(args,input=command,text=True,capture_output=True,env=env)
-    if completed.returncode: raise SystemExit('Read-only SSH inspection failed; no site files were changed.')
+    if completed.returncode:
+        print(completed.stderr[-1800:])
+        raise SystemExit('Read-only SSH inspection failed; no site files were changed.')
     # Paths are intentionally only in authenticated Actions logs, not the public status branch.
     print(completed.stdout)
+    fields={}
+    for line in completed.stdout.splitlines():
+        if '=' in line:
+            key,value=line.split('=',1)
+            fields.setdefault(key,[]).append(value)
+    (ROOT/'build').mkdir(exist_ok=True)
+    (ROOT/'build/jdm-inspection.json').write_text(json.dumps({'project':'lombard-11','authenticated':True,'read_only':True,'fields':fields,'ssh_trust':'first-use pinned; not independently verified'},indent=2)+'\n')

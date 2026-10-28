@@ -59,10 +59,10 @@ jobs:
                   out.write('## Not deployed\nJDM target not enabled. Build is checked; no production transfer took place. See docs/JDM.md.\n')
           PY
       - name: Install password authentication helper
-        if: success() && (env.OPERATION == 'inspect' || env.JDM_PRODUCTION_ENABLED == 'true' || env.JDM_PREVIEW_ENABLED == 'true')
+        if: success() && (env.OPERATION == 'inspect' || (env.JDM_PRODUCTION_ENABLED != 'true' && env.JDM_PREVIEW_ENABLED != 'true') || env.JDM_PRODUCTION_ENABLED == 'true' || env.JDM_PREVIEW_ENABLED == 'true')
         run: sudo apt-get update -qq && sudo apt-get install -y -qq sshpass
       - name: Read-only SSH inspection
-        if: success() && env.OPERATION == 'inspect'
+        if: success() && (env.OPERATION == 'inspect' || (env.JDM_PRODUCTION_ENABLED != 'true' && env.JDM_PREVIEW_ENABLED != 'true'))
         env:
           JDM_SSH_PASSWORD: ${{ secrets.JDM_SSH_PASSWORD }}
           JDM_SSH_KNOWN_HOSTS: ${{ secrets.JDM_SSH_KNOWN_HOSTS }}

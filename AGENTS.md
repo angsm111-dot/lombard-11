@@ -21,7 +21,7 @@ Nie zmieniaj poczty, innych domen ani nie kasuj WordPressa, jego bazy, starych p
 
 Produkcja i podgląd mają odrębne katalogi/hosty. Przerwa techniczna tylko na produkcji, wyłącznie na jawne polecenie, nigdy automatycznie przy wdrożeniu. Zmiana flagi nie usuwa strony. Nie myl odziedziczonej przerwy WordPressa z nowym mechanizmem.
 
-Cloudflare: publiczny certyfikat nie potwierdza certyfikatu JDM. Nie ogłaszaj Full (strict) dopóki certyfikat originu z SNI i tryb w panelu Cloudflare nie zostały sprawdzone. Nigdy `curl -k`, `StrictHostKeyChecking=no` ani automatyczne zaufanie do ssh-keyscan.
+Cloudflare: publiczny certyfikat nie potwierdza certyfikatu JDM. Nie ogłaszaj Full (strict) dopóki certyfikat originu z SNI i tryb w panelu Cloudflare nie zostały sprawdzone. Nigdy `curl -k` ani `StrictHostKeyChecking=no`. Wyjątek zaakceptowany przez właściciela 28.10.2026: przypięto początkowy klucz z audytu jako trust-on-first-use, bez potwierdzenia BOK. Nie twierdzić, że to niezależna weryfikacja; nie aktualizować automatycznie klucza przy kolejnych odczytach.
 
 ## Obecny stan początkowy (2026-10-28)
 

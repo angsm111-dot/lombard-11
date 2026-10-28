@@ -50,7 +50,7 @@ def run(target,operation):
     if config['preview_root'] and config['production_root']:
         prod=Path(config['production_root']);preview=Path(config['preview_root'])
         if prod==preview or prod in preview.parents or preview in prod.parents: raise ValueError('Target directories overlap')
-    host=os.environ.get('JDM_SSH_HOST','');user=os.environ.get('JDM_SSH_USER','');port=os.environ.get('JDM_SSH_PORT','')
+    host=os.environ.get('JDM_SSH_HOST') or config['ssh_host'];user=os.environ.get('JDM_SSH_USER') or config['ssh_user'];port=os.environ.get('JDM_SSH_PORT') or str(config['ssh_port'])
     if not re.fullmatch(r'[a-zA-Z0-9.-]+',host) or not re.fullmatch(r'[a-zA-Z0-9_-]+',user) or not port.isdigit() or not 1<=int(port)<=65535: raise ValueError('SSH host/user/port missing or invalid')
     if not re.fullmatch(r'/[A-Za-z0-9_./-]+',root) or '..' in root.split('/'): raise ValueError('Unsafe deployment root')
     run_id=os.environ['GITHUB_RUN_ID'];attempt=os.environ['GITHUB_RUN_ATTEMPT'];release_id=f'{commit}-{run_id}-{attempt}'
@@ -59,7 +59,7 @@ def run(target,operation):
     with tempfile.TemporaryDirectory() as tmp:
         key=Path(tmp)/'key';known=Path(tmp)/'known_hosts'
         key.write_text(os.environ.get('JDM_SSH_PRIVATE_KEY','').strip()+'\n');key.chmod(0o600)
-        known.write_text(os.environ.get('JDM_SSH_KNOWN_HOSTS','').strip()+'\n');known.chmod(0o600)
+        known.write_text((os.environ.get('JDM_SSH_KNOWN_HOSTS') or (ROOT/'hosting/ssh_known_hosts').read_text()).strip()+'\n');known.chmod(0o600)
         fingerprints=subprocess.run(['ssh-keygen','-lf',str(known),'-E','sha256'],capture_output=True,text=True,check=True).stdout
         expected=config['ssh_host_fingerprint_sha256']
         observed=[line.split()[1] for line in fingerprints.splitlines()]
